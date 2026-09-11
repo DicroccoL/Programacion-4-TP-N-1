@@ -1,0 +1,55 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <header class="auth-header">
+      <h2>Mi Cuenta</h2>
+      <p>Accedé a tus compras, puntos y beneficios del Cine</p>
+    </header>
+
+    <nav class="auth-tabs">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="tab === 'login'"
+        (click)="cambiarTab('login')"
+      >
+        Iniciar Sesión
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.active]="tab === 'register'"
+        (click)="cambiarTab('register')"
+      >
+        Registrarse
+      </button>
+    </nav>
+
+    @if (errorMessage) {
+      <div class="alert alert-error">
+        {{ errorMessage }}
+      </div>
+    }
+
+    @if (successMessage) {
+      <div class="alert alert-success">
+        {{ successMessage }}
+      </div>
+    }
+
+    <main class="auth-body">
+      @if (tab === 'login') {
+        <app-componente-login
+          [isLoading]="authService.isLoading()"
+          (loginSubmit)="handleLogin($event)"
+        />
+      }
+
+      @if (tab === 'register') {
+        <app-componente-registro
+          [isLoading]="authService.isLoading()"
+          (registerSubmit)="handleRegister($event)"
+        />
+      }
+    </main>
+  </div>
+</div>
