@@ -65,6 +65,50 @@
     />
   </div>
 
+  <div class="form-group">
+    <label for="register-tipo-sangre">Tipo de Sangre</label>
+    <select
+      id="register-tipo-sangre"
+      name="tipoSangre"
+      [(ngModel)]="tipoSangre"
+      required
+      [disabled]="isLoading()"
+    >
+      <option value="" disabled selected>Selecciona tu tipo de sangre</option>
+      @for (tipo of tiposDeSangre; track tipo) {
+        <option [value]="tipo">{{ tipo }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="register-color-ojos">Color de Ojos</label>
+    <input
+      id="register-color-ojos"
+      type="text"
+      name="colorOjos"
+      [(ngModel)]="colorOjos"
+      placeholder="Ej: Marrón, Azul, Verde"
+      required
+      [disabled]="isLoading()"
+    />
+  </div>
+
+  <div class="form-group">
+    <label for="register-vacaciones">Días de vacaciones por año</label>
+    <input
+      id="register-vacaciones"
+      type="number"
+      min="0"
+      max="365"
+      name="diasVacacionesAnio"
+      [(ngModel)]="diasVacacionesAnio"
+      placeholder="Ej: 14"
+      required
+      [disabled]="isLoading()"
+    />
+  </div>
+
   <button type="submit" [disabled]="isLoading()" class="btn-submit">
     @if (isLoading()) {
       Creando cuenta...
@@ -73,3 +117,4 @@
     }
   </button>
 </form>
+

@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RegisterCredentials } from '../../models/user.model';
+import { RegisterCredentials, TipoSangre } from '../../models/user.model';
 
 @Component({
   selector: 'app-componente-registro',
@@ -18,10 +18,25 @@ export class ComponenteRegistro {
   email = '';
   password = '';
   fechaNacimiento = '';
+  tipoSangre = '';
+  colorOjos = '';
+  diasVacacionesAnio: number | null = null;
+
+  readonly tiposDeSangre: TipoSangre[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
 
   onSubmit(event: Event): void {
     event.preventDefault();
-    if (!this.nombre || !this.apellido || !this.email || !this.password || !this.fechaNacimiento) {
+    if (
+      !this.nombre ||
+      !this.apellido ||
+      !this.email ||
+      !this.password ||
+      !this.fechaNacimiento ||
+      !this.tipoSangre ||
+      !this.colorOjos ||
+      this.diasVacacionesAnio === null ||
+      this.diasVacacionesAnio < 0
+    ) {
       return;
     }
     this.registerSubmit.emit({
@@ -30,6 +45,10 @@ export class ComponenteRegistro {
       email: this.email,
       password: this.password,
       fechaNacimiento: this.fechaNacimiento,
+      tipoSangre: this.tipoSangre,
+      colorOjos: this.colorOjos,
+      diasVacacionesAnio: Number(this.diasVacacionesAnio),
     });
   }
 }
+
