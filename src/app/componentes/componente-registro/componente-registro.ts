@@ -23,6 +23,7 @@ export class ComponenteRegistro {
   diasVacacionesAnio: number | null = null;
 
   readonly tiposDeSangre: TipoSangre[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+  readonly coloresDeOjos = ['Marrón', 'Azul', 'Verde', 'Gris', 'Negro', 'Avellana'];
 
   onSubmit(event: Event): void {
     event.preventDefault();

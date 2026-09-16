@@ -1,0 +1,44 @@
+<div class="app-layout">
+  <header class="app-navbar">
+    <div class="nav-container">
+      <a routerLink="/" class="nav-brand">
+        <span>WildeCinemas</span>
+      </a>
+
+      <nav class="nav-links">
+        @if (!authService.isAdmin()) {
+          <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+        }
+        <a *soloAdmin routerLink="/admin" routerLinkActive="active">Administración</a>
+      </nav>
+
+      <div class="nav-auth">
+        @if (authService.isLoggedIn()) {
+          <span class="user-greeting">
+            Hola, <strong>{{ authService.currentProfile()?.nombre || 'Usuario' }}</strong>
+          </span>
+          <button type="button" class="btn-nav btn-logout" (click)="cerrarSesion()">
+            Cerrar Sesión
+          </button>
+        } @else {
+          <a
+            routerLink="/login"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="btn-nav btn-login"
+          >
+            Iniciar Sesión
+          </a>
+        }
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="app-footer">
+    <p>© 2026 Sistema de Cine - TP Programación IV - Proyecto realizado por Lucas Di Crocco</p>
+  </footer>
+</div>

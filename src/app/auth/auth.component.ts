@@ -34,8 +34,7 @@ export class AuthComponent {
 
     if (result.success) {
       this.successMessage = '¡Inicio de sesión exitoso!';
-      // Redirigir según necesidad (ej. al home)
-      // this.router.navigate(['/']);
+      await this.router.navigate([this.authService.isAdmin() ? '/admin' : '/']);
     } else {
       this.errorMessage = result.error ?? 'Error al iniciar sesión. Verifica tus credenciales.';
     }
@@ -49,6 +48,7 @@ export class AuthComponent {
 
     if (result.success) {
       this.successMessage = '¡Cuenta creada con éxito!';
+      await this.router.navigate(['/']);
     } else {
       this.errorMessage = result.error ?? 'Error al registrar la cuenta.';
     }

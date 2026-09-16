@@ -13,6 +13,7 @@ import {
 })
 export class AuthService {
   private supabase: SupabaseClient;
+  private readonly authReady: Promise<void>;
 
   // Estado reactivo con Signals
   readonly currentUser = signal<User | null>(null);
@@ -32,7 +33,11 @@ export class AuthService {
       environment.supabaseKey
     );
 
-    this.initAuth();
+    this.authReady = this.initAuth();
+  }
+
+  async whenReady(): Promise<void> {
+    await this.authReady;
   }
 
   get client(): SupabaseClient {

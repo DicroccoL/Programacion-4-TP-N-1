@@ -1,0 +1,15 @@
+.admin-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.admin-container h2 {
+  color: #2e1065;
+  margin-bottom: 0.75rem;
+}
+
+.admin-container p {
+  color: #6b637b;
+  font-size: 1.1rem;
+}
