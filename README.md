@@ -1,6 +1,9 @@
-# ProyectoCine
+# 🎬 Proyecto Cine (Cine Wilde)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.1.8.
+Aplicación web para gestión y venta de entradas de cine desarrollada con **Angular** y **Supabase**.
+
+> 📖 **Documentación de Arquitectura Completa:** Consulta [ARQUITECTURA.md](ARQUITECTURA.md) para ver la estructura detallada de carpetas, modelos, flujo de autenticación, esquema de base de datos en Supabase y procedimientos de desarrollo.
+
 
 ## Development server
 

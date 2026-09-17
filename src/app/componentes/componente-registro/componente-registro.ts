@@ -1,11 +1,11 @@
 import { Component, input, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RegisterCredentials, TipoSangre } from '../../models/user.model';
 
 @Component({
   selector: 'app-componente-registro',
   standalone: true,
-  imports: [FormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './componente-registro.html',
   styleUrl: './componente-registro.css',
 })
@@ -13,42 +13,41 @@ export class ComponenteRegistro {
   readonly isLoading = input<boolean>(false);
   readonly registerSubmit = output<RegisterCredentials>();
 
-  nombre = '';
-  apellido = '';
-  email = '';
-  password = '';
-  fechaNacimiento = '';
-  tipoSangre = '';
-  colorOjos = '';
-  diasVacacionesAnio: number | null = null;
-
   readonly tiposDeSangre: TipoSangre[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
   readonly coloresDeOjos = ['Marrón', 'Azul', 'Verde', 'Gris', 'Negro', 'Avellana'];
 
-  onSubmit(event: Event): void {
-    event.preventDefault();
-    if (
-      !this.nombre ||
-      !this.apellido ||
-      !this.email ||
-      !this.password ||
-      !this.fechaNacimiento ||
-      !this.tipoSangre ||
-      !this.colorOjos ||
-      this.diasVacacionesAnio === null ||
-      this.diasVacacionesAnio < 0
-    ) {
+  readonly registerForm: FormGroup;
+
+  constructor(private readonly fb: FormBuilder) {
+    this.registerForm = this.fb.nonNullable.group({
+      nombre: ['', [Validators.required, Validators.minLength(2)]],
+      apellido: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      fechaNacimiento: ['', [Validators.required]],
+      tipoSangre: ['', [Validators.required]],
+      colorOjos: ['', [Validators.required]],
+      diasVacacionesAnio: [null as number | null, [Validators.required, Validators.min(0), Validators.max(365)]],
+    });
+  }
+
+  onSubmit(): void {
+    if (this.registerForm.invalid) {
+      this.registerForm.markAllAsTouched();
       return;
     }
+
+    const { value } = this.registerForm;
+
     this.registerSubmit.emit({
-      nombre: this.nombre,
-      apellido: this.apellido,
-      email: this.email,
-      password: this.password,
-      fechaNacimiento: this.fechaNacimiento,
-      tipoSangre: this.tipoSangre,
-      colorOjos: this.colorOjos,
-      diasVacacionesAnio: Number(this.diasVacacionesAnio),
+      nombre: value.nombre ?? '',
+      apellido: value.apellido ?? '',
+      email: value.email ?? '',
+      password: value.password ?? '',
+      fechaNacimiento: value.fechaNacimiento ?? '',
+      tipoSangre: value.tipoSangre ?? '',
+      colorOjos: value.colorOjos ?? '',
+      diasVacacionesAnio: Number(value.diasVacacionesAnio ?? 0),
     });
   }
 }

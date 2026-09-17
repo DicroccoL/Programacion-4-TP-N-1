@@ -1,4 +1,4 @@
-<form (submit)="onSubmit($event)" class="register-form">
+<form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
   <h3>Registrarse</h3>
 
   <div class="form-group">
@@ -6,12 +6,13 @@
     <input
       id="register-nombre"
       type="text"
-      name="nombre"
-      [(ngModel)]="nombre"
+      formControlName="nombre"
       placeholder="Tu nombre"
-      required
       [disabled]="isLoading()"
     />
+    @if (registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched) {
+      <small>El nombre es obligatorio y debe tener al menos 2 caracteres.</small>
+    }
   </div>
 
   <div class="form-group">
@@ -19,12 +20,13 @@
     <input
       id="register-apellido"
       type="text"
-      name="apellido"
-      [(ngModel)]="apellido"
+      formControlName="apellido"
       placeholder="Tu apellido"
-      required
       [disabled]="isLoading()"
     />
+    @if (registerForm.get('apellido')?.invalid && registerForm.get('apellido')?.touched) {
+      <small>El apellido es obligatorio y debe tener al menos 2 caracteres.</small>
+    }
   </div>
 
   <div class="form-group">
@@ -32,12 +34,13 @@
     <input
       id="register-email"
       type="email"
-      name="email"
-      [(ngModel)]="email"
+      formControlName="email"
       placeholder="correo@ejemplo.com"
-      required
       [disabled]="isLoading()"
     />
+    @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+      <small>Ingresá un email válido.</small>
+    }
   </div>
 
   <div class="form-group">
@@ -45,12 +48,13 @@
     <input
       id="register-password"
       type="password"
-      name="password"
-      [(ngModel)]="password"
+      formControlName="password"
       placeholder="Mínimo 6 caracteres"
-      required
       [disabled]="isLoading()"
     />
+    @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+      <small>La contraseña debe tener al menos 6 caracteres.</small>
+    }
   </div>
 
   <div class="form-group">
@@ -58,20 +62,19 @@
     <input
       id="register-fecha"
       type="date"
-      name="fechaNacimiento"
-      [(ngModel)]="fechaNacimiento"
-      required
+      formControlName="fechaNacimiento"
       [disabled]="isLoading()"
     />
+    @if (registerForm.get('fechaNacimiento')?.invalid && registerForm.get('fechaNacimiento')?.touched) {
+      <small>La fecha de nacimiento es obligatoria.</small>
+    }
   </div>
 
   <div class="form-group">
     <label for="register-tipo-sangre">Tipo de Sangre</label>
     <select
       id="register-tipo-sangre"
-      name="tipoSangre"
-      [(ngModel)]="tipoSangre"
-      required
+      formControlName="tipoSangre"
       [disabled]="isLoading()"
     >
       <option value="" disabled selected>Selecciona tu tipo de sangre</option>
@@ -79,15 +82,16 @@
         <option [value]="tipo">{{ tipo }}</option>
       }
     </select>
+    @if (registerForm.get('tipoSangre')?.invalid && registerForm.get('tipoSangre')?.touched) {
+      <small>Seleccioná un tipo de sangre.</small>
+    }
   </div>
 
   <div class="form-group">
     <label for="register-color-ojos">Color de Ojos</label>
     <select
       id="register-color-ojos"
-      name="colorOjos"
-      [(ngModel)]="colorOjos"
-      required
+      formControlName="colorOjos"
       [disabled]="isLoading()"
     >
       <option value="" disabled selected>Selecciona tu color de ojos</option>
@@ -95,6 +99,9 @@
         <option [value]="color">{{ color }}</option>
       }
     </select>
+    @if (registerForm.get('colorOjos')?.invalid && registerForm.get('colorOjos')?.touched) {
+      <small>Seleccioná un color de ojos.</small>
+    }
   </div>
 
   <div class="form-group">
@@ -104,15 +111,16 @@
       type="number"
       min="0"
       max="365"
-      name="diasVacacionesAnio"
-      [(ngModel)]="diasVacacionesAnio"
+      formControlName="diasVacacionesAnio"
       placeholder="Ej: 14"
-      required
       [disabled]="isLoading()"
     />
+    @if (registerForm.get('diasVacacionesAnio')?.invalid && registerForm.get('diasVacacionesAnio')?.touched) {
+      <small>Ingresá un número entre 0 y 365.</small>
+    }
   </div>
 
-  <button type="submit" [disabled]="isLoading()" class="btn-submit">
+  <button type="submit" [disabled]="isLoading() || registerForm.invalid" class="btn-submit">
     @if (isLoading()) {
       Creando cuenta...
     } @else {
