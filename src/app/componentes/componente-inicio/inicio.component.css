@@ -8,8 +8,8 @@
 }
 
 .hero-banner {
-  background: linear-gradient(135deg, #4c1d95 0%, #2e1065 100%);
-  color: white;
+  background: linear-gradient(135deg, #1a0b2e 0%, #000000 100%);
+  color: #f3e8ff;
   padding: 2.5rem 1.5rem;
   border-radius: 12px;
   text-align: center;
@@ -19,11 +19,11 @@
 .hero-banner h2 {
   font-size: 1.8rem;
   margin-bottom: 0.5rem;
-  color: #ffffff;
+  color: #f3e8ff;
 }
 
 .hero-banner p {
-  color: #ddd6fe;
+  color: #d8b4fe;
   font-size: 1rem;
 }
 
@@ -35,13 +35,13 @@
 
 .seccion-header h3 {
   font-size: 1.3rem;
-  color: #2e1065;
+  color: #e9d5ff;
   margin-bottom: 0.2rem;
 }
 
 .seccion-header .subtitulo {
   font-size: 0.85rem;
-  color: #6b637b;
+  color: #c4b5fd;
 }
 
 .grid-cards {
@@ -51,8 +51,8 @@
 }
 
 .card-pelicula {
-  background: white;
-  border: 1px solid #ede9fe;
+  background: #0d0018;
+  border: 1px solid #512080;
   border-radius: 10px;
   padding: 1rem;
   display: flex;
@@ -64,32 +64,32 @@
 
 .card-pelicula:hover {
   transform: translateY(-2px);
-  border-color: #c4b5fd;
+  border-color: #a855f7;
   box-shadow: 0 8px 16px -4px rgba(124, 58, 237, 0.12);
 }
 
 .poster-preview {
   height: 180px;
-  background-color: #f5f3ff;
+  background-color: #1a0b2e;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #7c3aed;
+  color: #d8b4fe;
   font-weight: 500;
-  border: 1px dashed #ddd6fe;
+  border: 1px dashed #8b5cf6;
 }
 
 .card-pelicula h4 {
   font-size: 1rem;
-  color: #1e1b2e;
+  color: #f3e8ff;
   margin: 0;
 }
 
 .genero-tag {
   font-size: 0.8rem;
-  color: #6d28d9;
-  background-color: #f5f3ff;
+  color: #d8b4fe;
+  background-color: #1a0b2e;
   display: inline-block;
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
@@ -98,11 +98,10 @@
 }
 
 .proximamente-banner {
-  background-color: #fdfcff;
-  border: 1px dashed #c4b5fd;
+  background-color: #0d0018;
+  border: 1px dashed #8b5cf6;
   padding: 1.5rem;
   border-radius: 10px;
-  color: #6b637b;
+  color: #c4b5fd;
   text-align: center;
 }
-

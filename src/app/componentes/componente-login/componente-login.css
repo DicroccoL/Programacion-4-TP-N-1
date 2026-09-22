@@ -14,23 +14,23 @@
 .form-group label {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #2e1065;
+  color: #e9d5ff;
 }
 
 .form-group input {
   padding: 0.65rem 0.85rem;
-  border: 1px solid #ddd6fe;
+  border: 1px solid #8b5cf6;
   border-radius: 6px;
   font-size: 0.95rem;
-  background-color: #ffffff;
+  background-color: #09000f;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .btn-submit {
   margin-top: 0.5rem;
   padding: 0.75rem;
-  background-color: #7c3aed;
-  color: white;
+  background-color: #9333ea;
+  color: #ffffff;
   border: none;
   border-radius: 6px;
   font-size: 1rem;
@@ -41,7 +41,7 @@
 }
 
 .btn-submit:hover:not(:disabled) {
-  background-color: #6d28d9;
+  background-color: #a855f7;
   transform: translateY(-1px);
 }
 

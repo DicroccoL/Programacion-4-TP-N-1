@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AuthService } from '../services/auth';
-import { SoloAdminDirective } from '../directivas/solo-admin.directive';
+import { AuthService } from '../../services/auth';
+import { SoloAdminDirective } from '../../directivas/solo-admin.directive';
 
 @Component({
   selector: 'app-layout',

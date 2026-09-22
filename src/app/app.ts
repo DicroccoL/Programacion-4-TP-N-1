@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { AppLayoutComponent } from './layout/app-layout.component';
+import { AppLayoutComponent } from './componentes/componente-layout/app-layout.component';
 
 @Component({
   selector: 'app-root',

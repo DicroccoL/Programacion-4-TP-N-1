@@ -3,13 +3,13 @@
   flex-direction: column;
   min-height: 100vh;
   font-family: var(--font-primary);
-  color: #1e1b2e;
-  background-color: #faf8fd;
+  color: var(--text-primary);
+  background-color: #000000;
 }
 
 .app-navbar {
-  background-color: #ffffff;
-  border-bottom: 1px solid #ede9fe;
+  background-color: #09000f;
+  border-bottom: 1px solid #512080;
   position: sticky;
   top: 0;
   z-index: 50;
@@ -30,7 +30,7 @@
 .nav-brand {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #2e1065;
+  color: #e9d5ff;
   text-decoration: none;
   display: flex;
   align-items: center;
@@ -47,7 +47,7 @@
 
 .nav-links a {
   text-decoration: none;
-  color: #6b637b;
+  color: #c4b5fd;
   font-weight: 500;
   padding: 0.4rem 0.6rem;
   border-radius: 6px;
@@ -56,8 +56,8 @@
 
 .nav-links a.active,
 .nav-links a:hover {
-  color: #7c3aed;
-  background-color: #f5f3ff;
+  color: #d8b4fe;
+  background-color: #1a0b2e;
 }
 
 .nav-links a.active {
@@ -76,7 +76,7 @@
 
 .user-greeting {
   font-size: 0.9rem;
-  color: #5b21b6;
+  color: #c084fc;
   font-weight: 500;
 }
 
@@ -92,24 +92,24 @@
 }
 
 .btn-login {
-  background-color: #7c3aed;
-  color: white;
+  background-color: #9333ea;
+  color: #ffffff;
   box-shadow: 0 2px 4px rgba(124, 58, 237, 0.2);
 }
 
 .btn-login:hover {
-  background-color: #6d28d9;
+  background-color: #a855f7;
 }
 
 .btn-logout {
   background-color: transparent;
-  border-color: #ddd6fe;
-  color: #6d28d9;
+  border-color: #8b5cf6;
+  color: #d8b4fe;
 }
 
 .btn-logout:hover {
-  background-color: #f5f3ff;
-  color: #5b21b6;
+  background-color: #1a0b2e;
+  color: #e9d5ff;
 }
 
 .app-main {
@@ -117,10 +117,10 @@
 }
 
 .app-footer {
-  border-top: 1px solid #ede9fe;
-  background-color: #ffffff;
+  border-top: 1px solid #512080;
+  background-color: #09000f;
   padding: 1.25rem 1rem;
   text-align: center;
-  color: #938ca2;
+  color: #a78bfa;
   font-size: 0.85rem;
 }

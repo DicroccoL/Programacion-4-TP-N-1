@@ -5,6 +5,7 @@ import { AuthService } from '../services/auth';
   selector: '[soloAdmin]',
   standalone: true,
 })
+
 export class SoloAdminDirective {
   private readonly templateRef = inject(TemplateRef<unknown>);
   private readonly viewContainer = inject(ViewContainerRef);

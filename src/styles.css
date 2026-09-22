@@ -1,16 +1,16 @@
 :root {
-  --purple-50: #f5f3ff;
-  --purple-100: #ede9fe;
-  --purple-200: #ddd6fe;
-  --purple-300: #c4b5fd;
-  --purple-600: #7c3aed;
-  --purple-700: #6d28d9;
-  --purple-800: #5b21b6;
-  --purple-900: #2e1065;
-  --bg-page: #faf8fd;
-  --text-primary: #1e1b2e;
-  --text-secondary: #6b637b;
-  --border-light: #eae5f2;
+  --purple-50: #1a0b2e;
+  --purple-100: #2b1248;
+  --purple-200: #512080;
+  --purple-300: #8b5cf6;
+  --purple-600: #a855f7;
+  --purple-700: #9333ea;
+  --purple-800: #c084fc;
+  --purple-900: #e9d5ff;
+  --bg-page: #000000;
+  --text-primary: #f3e8ff;
+  --text-secondary: #c4b5fd;
+  --border-light: #512080;
   --font-primary: 'Segoe UI Black', 'Segoe UI', sans-serif;
 }
 
