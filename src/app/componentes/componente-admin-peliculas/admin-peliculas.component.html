@@ -1,0 +1,41 @@
+<section class="admin-seccion">
+  <nav class="crud-navegacion" aria-label="Apartados del CRUD de películas">
+    <button
+      type="button"
+      [class.activo]="apartadoActivo === 'crear'"
+      [attr.aria-current]="apartadoActivo === 'crear' ? 'page' : null"
+      (click)="seleccionarApartado('crear')"
+    >
+      Crear película
+    </button>
+    <button
+      type="button"
+      [class.activo]="apartadoActivo === 'listar'"
+      [attr.aria-current]="apartadoActivo === 'listar' ? 'page' : null"
+      (click)="seleccionarApartado('listar')"
+    >
+      Películas cargadas
+    </button>
+  </nav>
+
+  @if (apartadoActivo === 'crear') {
+    <app-formulario-pelicula
+      [formulario]="formulario"
+      [estados]="estados"
+      [peliculaEditandoId]="peliculaEditandoId"
+      [guardando]="guardando()"
+      [mensaje]="mensaje()"
+      [error]="error()"
+      (guardar)="guardarPelicula()"
+      (cancelar)="cancelarEdicion()"
+    />
+  } @else {
+    <app-listado-peliculas
+      [peliculas]="peliculas()"
+      [cargando]="cargando()"
+      [error]="error()"
+      (editar)="editarPelicula($event)"
+      (eliminar)="eliminarPelicula($event)"
+    />
+  }
+</section>

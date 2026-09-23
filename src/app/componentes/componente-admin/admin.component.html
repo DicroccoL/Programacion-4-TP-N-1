@@ -1,4 +1,6 @@
 <section class="admin-container">
   <h2>Panel de administrador</h2>
   <p>Hola, {{ authService.currentProfile()?.nombre || 'Administrador' }}</p>
+
+  <app-admin-peliculas />
 </section>

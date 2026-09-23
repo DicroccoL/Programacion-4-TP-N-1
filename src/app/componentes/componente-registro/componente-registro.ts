@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RegisterCredentials, TipoSangre } from '../../models/user.model';
+import { CredencialesRegistro, TipoSangre } from '../../models/user.model';
 
 @Component({
   selector: 'app-componente-registro',
@@ -11,7 +11,7 @@ import { RegisterCredentials, TipoSangre } from '../../models/user.model';
 })
 export class ComponenteRegistro {
   readonly isLoading = input<boolean>(false);
-  readonly registerSubmit = output<RegisterCredentials>();
+  readonly registerSubmit = output<CredencialesRegistro>();
 
   readonly tiposDeSangre: TipoSangre[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
   readonly coloresDeOjos = ['Marrón', 'Azul', 'Verde', 'Gris', 'Negro', 'Avellana'];

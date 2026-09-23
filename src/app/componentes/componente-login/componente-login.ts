@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { LoginCredentials } from '../../models/user.model';
+import { CredencialesLogin } from '../../models/user.model';
 
 @Component({
   selector: 'app-componente-login',
@@ -14,7 +14,7 @@ export class ComponenteLogin {
   readonly isLoading = input<boolean>(false);
 
   // Evento que emite las credenciales limpias al componente padre
-  readonly loginSubmit = output<LoginCredentials>();
+  readonly loginSubmit = output<CredencialesLogin>();
 
   email = '';
   password = '';

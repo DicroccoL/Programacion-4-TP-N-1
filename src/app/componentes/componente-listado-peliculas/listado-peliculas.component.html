@@ -1,0 +1,37 @@
+<section class="seccion-admin">
+  <h3>Películas cargadas</h3>
+
+  @if (cargando) {
+    <p class="estado-listado">Cargando películas...</p>
+  } @else if (error) {
+    <p class="error-listado">{{ error }}</p>
+  } @else if (peliculas.length === 0) {
+    <p class="estado-listado">Todavía no hay películas cargadas.</p>
+  } @else {
+    <div class="tabla-contenedor">
+      <table>
+        <thead>
+          <tr>
+            <th>Título</th>
+            <th>Estado</th>
+            <th>Duración</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (pelicula of peliculas; track pelicula.id) {
+            <tr>
+              <td>{{ pelicula.titulo }}</td>
+              <td>{{ pelicula.estado === 'EN_CARTELERA' ? 'En cartelera' : 'Próximamente' }}</td>
+              <td>{{ pelicula.duracionMin }} min</td>
+              <td class="acciones-tabla">
+                <button type="button" class="btn-secundario" (click)="editar.emit(pelicula)">Editar</button>
+                <button type="button" class="btn-peligro" (click)="eliminar.emit(pelicula)">Eliminar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

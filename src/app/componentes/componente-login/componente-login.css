@@ -23,6 +23,7 @@
   border-radius: 6px;
   font-size: 0.95rem;
   background-color: #09000f;
+  color: #f3e8ff;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 

@@ -1,0 +1,22 @@
+<a class="card-pelicula" [routerLink]="['/pelicula', pelicula().id]">
+  @if (pelicula().imagenUrl) {
+    <img
+      class="poster-preview poster-imagen"
+      [src]="pelicula().imagenUrl"
+      [alt]="'Póster de ' + pelicula().titulo"
+    />
+  } @else {
+    <div class="poster-preview">🎬 Póster</div>
+  }
+
+  <div class="pelicula-info">
+    <div class="titulo-fila">
+      <h4>{{ pelicula().titulo }}</h4>
+      <div class="badges-pelicula">
+        <span class="badge-pelicula">{{ pelicula().clasificacion }}</span>
+      </div>
+    </div>
+    <span class="duracion-pelicula">{{ pelicula().duracionMin }} min</span>
+    <p class="sinopsis">{{ pelicula().sinopsis }}</p>
+  </div>
+</a>

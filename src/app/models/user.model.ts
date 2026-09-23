@@ -1,8 +1,7 @@
-export type UserRole = 'cliente' | 'empleado' | 'admin';
-
+export type RolUsuario = 'cliente' | 'empleado' | 'admin';
 export type TipoSangre = 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
 
-export interface UserProfile {
+export interface PerfilUsuario {
   id: string;
   email: string;
   nombre: string;
@@ -11,18 +10,18 @@ export interface UserProfile {
   tipoSangre?: TipoSangre | string;
   colorOjos?: string;
   diasVacacionesAnio?: number;
-  rol: UserRole;
+  rol: RolUsuario;
   saldoCredito: number;
   puntosFidelidad: number;
   primeraCompraUsada: boolean;
 }
 
-export interface LoginCredentials {
+export interface CredencialesLogin {
   email: string;
   password: string;
 }
 
-export interface RegisterCredentials {
+export interface CredencialesRegistro {
   email: string;
   password: string;
   nombre: string;

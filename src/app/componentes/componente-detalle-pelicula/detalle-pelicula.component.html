@@ -1,0 +1,51 @@
+@if (cargando()) {
+  <main class="detalle-estado">
+    <p>Cargando película...</p>
+  </main>
+} @else if (error()) {
+  <main class="detalle-estado">
+    <p>{{ error() }}</p>
+    <a routerLink="/" class="boton-volver">Volver a cartelera</a>
+  </main>
+} @else if (pelicula(); as peliculaActual) {
+  <main class="detalle-pelicula">
+    <section
+      class="detalle-hero"
+      [style.background-image]="peliculaActual.imagenUrl ? 'linear-gradient(90deg, rgba(5, 7, 12, 0.98) 0%, rgba(5, 7, 12, 0.86) 42%, rgba(5, 7, 12, 0.7) 100%), url(' + peliculaActual.imagenUrl + ')' : null"
+    >
+      <div class="detalle-contenido">
+        <a routerLink="/" class="enlace-volver">← Volver a cartelera</a>
+
+        <div class="detalle-columnas">
+          <div class="poster-detalle-contenedor">
+            @if (peliculaActual.imagenUrl) {
+              <img
+                class="poster-detalle"
+                [src]="peliculaActual.imagenUrl"
+                [alt]="'Póster de ' + peliculaActual.titulo"
+              />
+            } @else {
+              <div class="poster-detalle poster-sin-imagen">🎬</div>
+            }
+          </div>
+
+          <div class="informacion-detalle">
+            <span class="estado-pelicula">{{ peliculaActual.estado === 'EN_CARTELERA' ? 'En cartelera' : 'Próximamente' }}</span>
+            <h1>{{ peliculaActual.titulo }}</h1>
+
+            <div class="badges-detalle" aria-label="Información de la película">
+              <span>{{ peliculaActual.clasificacion }}</span>
+              <span>2D</span>
+              <span>MONSTER SCREEN</span>
+            </div>
+
+            <p class="datos-pelicula">{{ peliculaActual.duracionMin }} min • {{ peliculaActual.genero || 'Género no informado' }}</p>
+            <p class="sinopsis-detalle">{{ peliculaActual.sinopsis }}</p>
+
+            <button type="button" class="boton-entradas">Comprar entradas</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+}

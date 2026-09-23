@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../services/auth';
 import { ComponenteLogin } from '../componentes/componente-login/componente-login';
 import { ComponenteRegistro } from '../componentes/componente-registro/componente-registro';
-import { LoginCredentials, RegisterCredentials } from '../models/user.model';
+import { CredencialesLogin, CredencialesRegistro } from '../models/user.model';
 
 @Component({
   selector: 'app-auth',
@@ -26,7 +26,7 @@ export class AuthComponent {
     this.successMessage = null;
   }
 
-  async handleLogin(credentials: LoginCredentials): Promise<void> {
+  async handleLogin(credentials: CredencialesLogin): Promise<void> {
     this.errorMessage = null;
     this.successMessage = null;
 
@@ -40,7 +40,7 @@ export class AuthComponent {
     }
   }
 
-  async handleRegister(credentials: RegisterCredentials): Promise<void> {
+  async handleRegister(credentials: CredencialesRegistro): Promise<void> {
     this.errorMessage = null;
     this.successMessage = null;
 

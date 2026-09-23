@@ -8,29 +8,23 @@
   <!-- Sección Top 3 más vistas -->
   <section class="seccion">
     <div class="seccion-header">
-      <h3>🔥 Más Vistas</h3>
+      <h3>  Peliculas</h3>
       <span class="subtitulo">Las películas favoritas de nuestra cartelera</span>
     </div>
 
-    <div class="grid-cards">
-      <article class="card-pelicula">
-        <div class="poster-preview">🎬 Póster</div>
-        <h4>Película Destacada 1</h4>
-        <span class="genero-tag">Acción • 2D/3D</span>
-      </article>
-
-      <article class="card-pelicula">
-        <div class="poster-preview">🎬 Póster</div>
-        <h4>Película Destacada 2</h4>
-        <span class="genero-tag">Ciencia Ficción • 4D</span>
-      </article>
-
-      <article class="card-pelicula">
-        <div class="poster-preview">🎬 Póster</div>
-        <h4>Película Destacada 3</h4>
-        <span class="genero-tag">Aventura • Castellano</span>
-      </article>
-    </div>
+    @if (cargando()) {
+      <p class="estado-cartelera">Cargando cartelera...</p>
+    } @else if (error()) {
+      <p class="estado-cartelera error-cartelera">{{ error() }}</p>
+    } @else if (peliculas().length === 0) {
+      <p class="estado-cartelera">Todavía no hay películas en cartelera.</p>
+    } @else {
+      <div class="grid-cards">
+        @for (pelicula of peliculas(); track pelicula.id) {
+          <app-tarjeta-pelicula [pelicula]="pelicula" />
+        }
+      </div>
+    }
   </section>
 
   <!-- Sección Próximamente -->
@@ -39,8 +33,17 @@
       <h3>📅 Próximamente</h3>
       <span class="subtitulo">Próximos estrenos y preventas exclusivas</span>
     </div>
-    <div class="proximamente-banner">
-      <p>Próximamente vas a poder suscribirte a alertas de disponibilidad para tus películas esperadas.</p>
-    </div>
+
+    @if (proximamente().length === 0) {
+      <div class="proximamente-banner">
+        <p>Próximamente vas a poder suscribirte a alertas de disponibilidad para tus películas esperadas.</p>
+      </div>
+    } @else {
+      <div class="grid-cards grid-cards-proximamente">
+        @for (pelicula of proximamente(); track pelicula.id) {
+          <app-tarjeta-pelicula [pelicula]="pelicula" />
+        }
+      </div>
+    }
   </section>
 </div>

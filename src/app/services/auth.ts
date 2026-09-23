@@ -2,10 +2,10 @@ import { Injectable, signal, computed } from '@angular/core';
 import { createClient, SupabaseClient, User } from '@supabase/supabase-js';
 import { environment } from '../../environments/environment';
 import {
-  LoginCredentials,
-  RegisterCredentials,
-  UserProfile,
-  UserRole,
+  CredencialesLogin,
+  CredencialesRegistro,
+  PerfilUsuario,
+  RolUsuario,
 } from '../models/user.model';
 
 @Injectable({
@@ -17,12 +17,12 @@ export class AuthService {
 
   // Estado reactivo con Signals
   readonly currentUser = signal<User | null>(null);
-  readonly currentProfile = signal<UserProfile | null>(null);
+  readonly currentProfile = signal<PerfilUsuario | null>(null);
   readonly isLoading = signal<boolean>(false);
 
   // Señales derivadas (computed)
   readonly isLoggedIn = computed(() => !!this.currentUser());
-  readonly userRole = computed<UserRole | null>(() => this.currentProfile()?.rol ?? null);
+  readonly userRole = computed<RolUsuario | null>(() => this.currentProfile()?.rol ?? null);
   readonly isAdmin = computed(() => this.userRole() === 'admin');
   readonly isEmpleado = computed(() => this.userRole() === 'empleado');
   readonly isCliente = computed(() => this.userRole() === 'cliente');
@@ -68,12 +68,12 @@ export class AuthService {
   }
 
   /**
-   * Carga el perfil del usuario desde la tabla 'profiles'
+  * Carga el perfil del usuario desde la tabla 'perfiles'
    */
   private async loadUserProfile(user: User): Promise<void> {
     try {
       const { data, error } = await this.supabase
-        .from('profiles')
+        .from('perfiles')
         .select('*')
         .eq('id', user.id)
         .maybeSingle();
@@ -88,7 +88,7 @@ export class AuthService {
           tipoSangre: data.tipo_sangre ?? user.user_metadata?.['tipo_sangre'] ?? '',
           colorOjos: data.color_ojos ?? user.user_metadata?.['color_ojos'] ?? '',
           diasVacacionesAnio: Number(data.dias_vacaciones_anio ?? user.user_metadata?.['dias_vacaciones_anio'] ?? 0),
-          rol: (data.rol as UserRole) ?? (user.user_metadata?.['rol'] as UserRole) ?? 'cliente',
+          rol: (data.rol as RolUsuario) ?? (user.user_metadata?.['rol'] as RolUsuario) ?? 'cliente',
           saldoCredito: Number(data.saldo_credito ?? 0),
           puntosFidelidad: Number(data.puntos_fidelidad ?? 0),
           primeraCompraUsada: Boolean(data.primera_compra_usada ?? false),
@@ -103,21 +103,21 @@ export class AuthService {
           tipoSangre: user.user_metadata?.['tipo_sangre'] ?? '',
           colorOjos: user.user_metadata?.['color_ojos'] ?? '',
           diasVacacionesAnio: Number(user.user_metadata?.['dias_vacaciones_anio'] ?? 0),
-          rol: (user.user_metadata?.['rol'] as UserRole) ?? 'cliente',
+          rol: (user.user_metadata?.['rol'] as RolUsuario) ?? 'cliente',
           saldoCredito: 0,
           puntosFidelidad: 0,
           primeraCompraUsada: false,
         });
       }
     } catch (err) {
-      console.warn('Error al cargar perfil de tabla profiles:', err);
+      console.warn('Error al cargar perfil de tabla perfiles:', err);
     }
   }
 
   /**
    * Iniciar sesión con email y contraseña
    */
-  async login(credentials: LoginCredentials): Promise<{ success: boolean; error?: string }> {
+  async login(credentials: CredencialesLogin): Promise<{ success: boolean; error?: string }> {
     this.isLoading.set(true);
     try {
       const { data, error } = await this.supabase.auth.signInWithPassword({
@@ -144,9 +144,9 @@ export class AuthService {
   }
 
   /**
-   * Registrar nuevo usuario y crear fila en 'profiles'
+  * Registrar nuevo usuario y crear fila en 'perfiles'
    */
-  async register(credentials: RegisterCredentials): Promise<{ success: boolean; error?: string }> {
+  async register(credentials: CredencialesRegistro): Promise<{ success: boolean; error?: string }> {
     this.isLoading.set(true);
     try {
       const { data, error } = await this.supabase.auth.signUp({
@@ -172,8 +172,8 @@ export class AuthService {
       if (data.user) {
         this.currentUser.set(data.user);
 
-        // Guardar en la tabla profiles
-        const { error: profileError } = await this.supabase.from('profiles').upsert({
+        // Guardar en la tabla perfiles
+        const { error: profileError } = await this.supabase.from('perfiles').upsert({
           id: data.user.id,
           email: credentials.email.trim(),
           nombre: credentials.nombre.trim(),
@@ -189,7 +189,7 @@ export class AuthService {
         });
 
         if (profileError) {
-          console.warn('Advertencia al insertar en tabla profiles:', profileError);
+          console.warn('Advertencia al insertar en tabla perfiles:', profileError);
         }
 
         await this.loadUserProfile(data.user);

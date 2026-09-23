@@ -12,6 +12,13 @@ export const routes: Routes = [
       import('./auth/auth.component').then((m) => m.AuthComponent),
   },
   {
+    path: 'pelicula/:id',
+    loadComponent: () =>
+      import('./componentes/componente-detalle-pelicula/detalle-pelicula.component').then(
+        (m) => m.DetallePeliculaComponent,
+      ),
+  },
+  {
     path: 'admin',
     loadComponent: () =>
       import('./componentes/componente-admin/admin.component').then((m) => m.AdminComponent),
