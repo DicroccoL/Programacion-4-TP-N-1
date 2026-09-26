@@ -1,0 +1,80 @@
+<section class="contenedor-formulario">
+  <div class="encabezado-formulario">
+    <div>
+      <h3>Cartelera</h3>
+      <span>Creá y administrá las películas que aparecen en Inicio.</span>
+    </div>
+    @if (crud.peliculaEditandoId()) {
+      <button type="button" class="btn-secundario" (click)="cancelar()">Cancelar edición</button>
+    }
+  </div>
+
+  @if (crud.mensaje()) {
+    <p class="mensaje mensaje-exito">{{ crud.mensaje() }}</p>
+  }
+  @if (crud.error()) {
+    <p class="mensaje mensaje-error">{{ crud.error() }}</p>
+  }
+
+  <form class="pelicula-form" (ngSubmit)="enviar()">
+    <div class="campo campo-amplio">
+      <label for="titulo-pelicula">Título</label>
+      <input id="titulo-pelicula" name="titulo" type="text" [(ngModel)]="crud.formulario().titulo" required />
+    </div>
+
+    <div class="campo">
+      <label for="genero-pelicula">Género</label>
+      <input id="genero-pelicula" name="genero" type="text" [(ngModel)]="crud.formulario().genero" placeholder="Terror, ciencia ficción" required />
+    </div>
+
+    <div class="campo">
+      <label for="duracion-pelicula">Duración (minutos)</label>
+      <input id="duracion-pelicula" name="duracionMin" type="number" min="1" [(ngModel)]="crud.formulario().duracionMin" required />
+    </div>
+
+    <div class="campo">
+      <label for="clasificacion-pelicula">Clasificación</label>
+      <select id="clasificacion-pelicula" name="clasificacion" [(ngModel)]="crud.formulario().clasificacion">
+        <option value="ATP">ATP</option>
+        <option value="+13">+13</option>
+        <option value="+18">+18</option>
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="estado-pelicula">Estado</label>
+      <select id="estado-pelicula" name="estado" [(ngModel)]="crud.formulario().estado">
+        @for (estado of crud.estados; track estado) {
+          <option [value]="estado">{{ estado === 'EN_CARTELERA' ? 'En cartelera' : 'Próximamente' }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="campo">
+      <label for="estreno-pelicula">Fecha de estreno</label>
+      <input id="estreno-pelicula" name="fechaEstreno" type="date" [(ngModel)]="crud.formulario().fechaEstreno" />
+    </div>
+
+    <div class="campo campo-amplio">
+      <label for="imagen-pelicula">URL de imagen</label>
+      <input id="imagen-pelicula" name="imagenUrl" type="url" [(ngModel)]="crud.formulario().imagenUrl" placeholder="https://..." />
+    </div>
+
+    <div class="campo campo-amplio">
+      <label for="sinopsis-pelicula">Sinopsis</label>
+      <textarea id="sinopsis-pelicula" name="sinopsis" rows="3" [(ngModel)]="crud.formulario().sinopsis" required></textarea>
+    </div>
+
+    <label class="campo-check" for="preventa-pelicula">
+      <input id="preventa-pelicula" name="preventaActiva" type="checkbox" [(ngModel)]="crud.formulario().preventaActiva" />
+      Preventa activa
+    </label>
+
+    <div class="acciones-form">
+      <button type="submit" class="btn-principal" [disabled]="crud.guardando()">
+        {{ crud.guardando() ? 'Guardando...' : (crud.peliculaEditandoId() ? 'Guardar cambios' : 'Crear película') }}
+      </button>
+    </div>
+  </form>
+</section>
+

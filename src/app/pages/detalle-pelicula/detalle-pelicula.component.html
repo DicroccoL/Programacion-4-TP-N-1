@@ -1,0 +1,87 @@
+@if (cargando()) {
+  <div class="detalle-estado-caja">
+    <p>Cargando información del título...</p>
+  </div>
+} @else if (error()) {
+  <div class="detalle-estado-caja estado-error">
+    <p>{{ error() }}</p>
+    <a routerLink="/" class="btn-volver">← Volver a cartelera</a>
+  </div>
+} @else if (pelicula(); as p) {
+  <div class="detalle-page">
+    <nav class="breadcrumb-nav">
+      <a routerLink="/" class="breadcrumb-link">← Volver a la cartelera</a>
+    </nav>
+
+    <article class="detalle-grid">
+      <!-- Columna Izquierda: Póster con marco arquitectónico -->
+      <aside class="detalle-poster-col">
+        <div class="poster-card">
+          @if (p.imagenUrl) {
+            <img [src]="p.imagenUrl" [alt]="'Póster de ' + p.titulo" class="poster-img" />
+          } @else {
+            <div class="poster-fallback">
+              <span>🎬</span>
+              <p>Sin póster oficial</p>
+            </div>
+          }
+        </div>
+
+        <div class="quick-specs">
+          <div class="quick-row">
+            <span class="quick-label">Estado</span>
+            <span class="quick-val status-val">{{ p.estado === 'EN_CARTELERA' ? 'En Exhibición' : 'Próximamente' }}</span>
+          </div>
+          <div class="quick-row">
+            <span class="quick-label">Clasificación</span>
+            <span class="quick-val age-val">{{ p.clasificacion }}</span>
+          </div>
+          @if (p.fechaEstreno) {
+            <div class="quick-row">
+              <span class="quick-label">Estreno</span>
+              <span class="quick-val">{{ p.fechaEstreno }}</span>
+            </div>
+          }
+        </div>
+      </aside>
+
+      <!-- Columna Derecha: Información Editorial y Compra -->
+      <main class="detalle-info-col">
+        <div class="info-header">
+          <span class="info-eyebrow">{{ p.genero || 'FICHA CINEMATOGRÁFICA' }}</span>
+          <h1 class="info-title">{{ p.titulo }}</h1>
+          <div class="info-meta-chips">
+            <span class="chip-item font-mono">{{ p.duracionMin }} MIN</span>
+            <span class="chip-item font-mono">SALAS 2D / 3D</span>
+            <span class="chip-item font-mono">DOLBY 7.1</span>
+          </div>
+        </div>
+
+        <section class="info-section">
+          <h2 class="section-subtitle">SINOPSIS OFICIAL</h2>
+          <p class="synopsis-text">{{ p.sinopsis }}</p>
+        </section>
+
+        <!-- Bloque de Compra / Funciones -->
+        <section class="info-buy-card">
+          <div class="buy-header">
+            <div>
+              <h3 class="buy-title">Selección de Butacas</h3>
+              <p class="buy-subtitle">Accedé al mapa en vivo de la sala para elegir butacas normales, VIP o accesibles.</p>
+            </div>
+            @if (p.preventaActiva) {
+              <span class="badge-preventa-chip">PREVENTA ACTIVA</span>
+            }
+          </div>
+
+          <div class="buy-actions">
+            <button type="button" class="btn-comprar">
+              Elegir Función y Butacas →
+            </button>
+            <span class="buy-hint">Compra anónima o con cuenta con 20% OFF</span>
+          </div>
+        </section>
+      </main>
+    </article>
+  </div>
+}

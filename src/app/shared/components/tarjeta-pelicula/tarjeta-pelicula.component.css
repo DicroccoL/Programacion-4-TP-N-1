@@ -1,0 +1,170 @@
+.card-pelicula {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+  height: 100%;
+}
+
+.card-pelicula:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.poster-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  background-color: #0E1015;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.card-pelicula:hover .poster-img {
+  transform: scale(1.02);
+}
+
+.poster-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.fallback-icon {
+  font-size: 2rem;
+}
+
+.fallback-title {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.poster-tags {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.badge-age {
+  padding: 0.2rem 0.45rem;
+  background-color: rgba(10, 11, 14, 0.9);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.badge-preventa {
+  padding: 0.2rem 0.45rem;
+  background-color: var(--accent-crimson);
+  border-radius: var(--radius-sm);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.card-body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.5rem;
+}
+
+.card-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.meta-genre {
+  color: var(--accent-crimson);
+  font-weight: 600;
+}
+
+.meta-dot {
+  color: var(--border-strong);
+}
+
+.card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-primary);
+  margin: 0;
+  transition: color 0.15s ease;
+}
+
+.card-pelicula:hover .card-title {
+  color: #ffffff;
+}
+
+.card-synopsis {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.card-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.85rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: color 0.15s ease;
+}
+
+.cta-arrow {
+  transition: transform 0.15s ease;
+}
+
+.card-pelicula:hover .card-cta {
+  color: var(--text-primary);
+}
+
+.card-pelicula:hover .cta-arrow {
+  transform: translateX(3px);
+  color: var(--accent-crimson);
+}

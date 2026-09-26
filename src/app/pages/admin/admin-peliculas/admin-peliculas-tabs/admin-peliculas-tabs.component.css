@@ -1,0 +1,29 @@
+.crud-navegacion {
+  display: flex;
+  gap: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.crud-navegacion button {
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.15s ease;
+}
+
+.crud-navegacion button:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+
+.crud-navegacion button.activo {
+  border-color: var(--accent-crimson);
+  background-color: var(--accent-crimson-subtle);
+  color: #ffffff;
+}

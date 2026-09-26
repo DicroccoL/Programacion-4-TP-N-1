@@ -1,0 +1,94 @@
+<div class="inicio-page">
+  <!-- Hero Editorial Asimétrico -->
+  <section class="hero-editorial">
+    <div class="hero-main">
+      <span class="hero-eyebrow">TEMPORADA 2026 — SALAS WILDE</span>
+      <h1 class="hero-title">
+        La experiencia de la gran pantalla, <span class="title-italic">redefinida</span>.
+      </h1>
+      <p class="hero-lead">
+        Proyecciones en formatos 2D, 3D y 4D con sonido inmersivo y salas con distribución de 20 filas, butacas VIP en últimas filas y sector exclusivo accesible.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#cartelera" class="btn-hero-primary">Ver Cartelera</a>
+        
+      </div>
+    </div>
+
+
+
+      <div class="hero-sidebar">
+  <div class="sidebar-block sidebar-promo">
+    <span class="promo-tag">BENEFICIO EXCLUSIVO</span>
+    <h3 class="promo-title">20% de descuento en tu primera compra</h3>
+    <p class="promo-desc">Creá tu cuenta en 1 minuto para acceder a cupones automáticos y acumulación de puntos por cada entrada o combo del Candy Bar.</p>
+    <a [routerLink]="['/login']" [queryParams]="{ tab: 'register' }" class="promo-link">Crear cuenta gratuita →</a>
+  </div>
+</div>
+    
+  </section>
+
+  <!-- Sección 01: Cartelera -->
+  <section id="cartelera" class="seccion-catalogo">
+    <div class="seccion-header">
+      <div class="header-titulos">
+        <span class="seccion-num">01 / CARTELERA</span>
+        <h2 class="seccion-title">Películas en Exhibición</h2>
+      </div>
+      <p class="seccion-bajada">
+        Funciones con horarios programados y 30 minutos de limpieza garantizada entre sesiones.
+      </p>
+    </div>
+
+    @if (cargando()) {
+      <div class="estado-caja">
+        <span class="loader-line"></span>
+        <p>Cargando programación de cartelera...</p>
+      </div>
+    } @else if (error()) {
+      <div class="estado-caja estado-error">
+        <p>{{ error() }}</p>
+      </div>
+    } @else if (peliculas().length === 0) {
+      <div class="estado-caja">
+        <p>No hay títulos en cartelera en este momento.</p>
+      </div>
+    } @else {
+      <div class="grid-peliculas">
+        @for (pelicula of peliculas(); track pelicula.id) {
+          <app-tarjeta-pelicula [pelicula]="pelicula" />
+        }
+      </div>
+    }
+  </section>
+
+  <!-- Sección 02: Próximamente y Preventas -->
+  <section class="seccion-catalogo seccion-proximamente">
+    <div class="seccion-header">
+      <div class="header-titulos">
+        <span class="seccion-num">02 / PRÓXIMOS ESTRENOS</span>
+        <h2 class="seccion-title">Preventas y Próximamente</h2>
+      </div>
+      <p class="seccion-bajada">
+        Preventa anticipada habilitada 7 días antes de la fecha oficial de estreno.
+      </p>
+    </div>
+
+    @if (proximamente().length === 0) {
+      <div class="proximamente-empty">
+        <div class="empty-inner">
+          <span class="empty-icon">📅</span>
+          <h3>Próximos lanzamientos en preparación</h3>
+          <p>Muy pronto vas a poder activar alertas para no perderte la preventa de los estrenos más esperados.</p>
+        </div>
+      </div>
+    } @else {
+      <div class="grid-peliculas">
+        @for (pelicula of proximamente(); track pelicula.id) {
+          <app-tarjeta-pelicula [pelicula]="pelicula" />
+        }
+      </div>
+    }
+  </section>
+</div>

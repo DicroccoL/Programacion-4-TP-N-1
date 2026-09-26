@@ -1,0 +1,62 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <header class="auth-header">
+      <span class="auth-badge">WILDECINEMAS ID</span>
+      <h1 class="auth-title">Acceso a tu Cuenta</h1>
+      <p class="auth-lead">Gestioná tus entradas, acumulá puntos de fidelidad y accedé a preventas exclusivas.</p>
+    </header>
+
+    <div class="auth-tabs" role="tablist">
+      <button
+        type="button"
+        role="tab"
+        class="tab-btn"
+        [class.active]="tab === 'login'"
+        [attr.aria-selected]="tab === 'login'"
+        (click)="cambiarTab('login')"
+      >
+        Ingresar
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="tab-btn"
+        [class.active]="tab === 'register'"
+        [attr.aria-selected]="tab === 'register'"
+        (click)="cambiarTab('register')"
+      >
+        Crear Cuenta
+      </button>
+    </div>
+
+    @if (errorMessage) {
+      <div class="alert alert-error" role="alert">
+        <span class="alert-icon">⚠</span>
+        <span>{{ errorMessage }}</span>
+      </div>
+    }
+
+    @if (successMessage) {
+      <div class="alert alert-success" role="status">
+        <span class="alert-icon">✓</span>
+        <span>{{ successMessage }}</span>
+      </div>
+    }
+
+    <main class="auth-content">
+      @if (tab === 'login') {
+        <app-login
+          [isLoading]="authService.isLoading()"
+          (loginSubmit)="handleLogin($event)"
+        />
+      }
+
+      @if (tab === 'register') {
+        <app-registro
+          [isLoading]="authService.isLoading()"
+          (registerSubmit)="handleRegister($event)"
+        />
+      }
+    </main>
+  </div>
+</div>

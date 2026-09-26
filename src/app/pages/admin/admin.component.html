@@ -1,0 +1,104 @@
+<section class="admin-container">
+  <header class="admin-header">
+    <div class="admin-titulo">
+      <h2>Panel de Administración</h2>
+      <p>Hola, <strong>{{ authService.currentProfile()?.nombre || 'Administrador' }}</strong></p>
+    </div>
+
+    <!-- Pestañas de navegación del Panel de Administración -->
+    <nav class="admin-tabs" aria-label="Secciones de administración">
+      <button
+        type="button"
+        class="tab-btn"
+        [class.activo]="seccionActiva() === 'peliculas'"
+        (click)="cambiarSeccion('peliculas')"
+      >
+         Películas
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.activo]="seccionActiva() === 'salas'"
+        (click)="cambiarSeccion('salas')"
+      >
+         Salas y Butacas
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.activo]="seccionActiva() === 'funciones'"
+        (click)="cambiarSeccion('funciones')"
+      >
+         Funciones
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.activo]="seccionActiva() === 'candybar'"
+        (click)="cambiarSeccion('candybar')"
+      >
+         Candy Bar
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.activo]="seccionActiva() === 'configuracion'"
+        (click)="cambiarSeccion('configuracion')"
+      >
+         Configuración
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
+        [class.activo]="seccionActiva() === 'reportes'"
+        (click)="cambiarSeccion('reportes')"
+      >
+         Reportes
+      </button>
+    </nav>
+  </header>
+
+  <!-- Contenido dinámico según la sección seleccionada -->
+  <main class="admin-content">
+    @switch (seccionActiva()) {
+      @case ('peliculas') {
+        <app-admin-peliculas />
+      }
+      @case ('salas') {
+        <div class="seccion-placeholder">
+          <h3>🏛️ Gestión de Salas y Butacas</h3>
+          <p>Configuración de las 20 filas (A-T) x 3 columnas, butacas VIP (R, S, T) y accesibles (filas centrales).</p>
+          <span class="badge-proximamente">Módulo en preparación</span>
+        </div>
+      }
+      @case ('funciones') {
+        <div class="seccion-placeholder">
+          <h3>🕒 Gestión de Funciones y Horarios</h3>
+          <p>Asignación de película a sala, formatos (2D/3D/4D/5D) y regla de 30 minutos entre funciones.</p>
+          <span class="badge-proximamente">Módulo en preparación</span>
+        </div>
+      }
+      @case ('candybar') {
+        <div class="seccion-placeholder">
+          <h3>🍿 Candy Bar y Combos</h3>
+          <p>Administración de productos, categorías, combos a precio fijo y recompensas en puntos.</p>
+          <span class="badge-proximamente">Módulo en preparación</span>
+        </div>
+      }
+      @case ('configuracion') {
+        <div class="seccion-placeholder">
+          <h3>⚙️ Configuración y Cupones</h3>
+          <p>Descuento configurable para la primera compra (20%), cupones para +50 años y puntos de fidelidad.</p>
+          <span class="badge-proximamente">Módulo en preparación</span>
+        </div>
+      }
+      @case ('reportes') {
+        <div class="seccion-placeholder">
+          <h3>📊 Reportes y Auditoría</h3>
+          <p>Facturación diaria, películas más vistas, exportación a PDF/Excel y registro de actividades.</p>
+          <span class="badge-proximamente">Módulo en preparación</span>
+        </div>
+      }
+    }
+  </main>
+</section>

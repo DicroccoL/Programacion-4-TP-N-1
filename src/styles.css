@@ -1,43 +1,93 @@
 :root {
-  --purple-50: #1a0b2e;
-  --purple-100: #2b1248;
-  --purple-200: #512080;
-  --purple-300: #8b5cf6;
-  --purple-600: #a855f7;
-  --purple-700: #9333ea;
-  --purple-800: #c084fc;
-  --purple-900: #e9d5ff;
-  --bg-page: #000000;
-  --text-primary: #f3e8ff;
-  --text-secondary: #c4b5fd;
-  --border-light: #512080;
-  --font-primary: 'Segoe UI Black', 'Segoe UI', sans-serif;
+  /* Paleta Editorial Cinematográfica */
+  --bg-canvas: #0A0B0E;
+  --bg-surface: #12141A;
+  --bg-surface-hover: #171A22;
+  --bg-surface-elevated: #1B1E28;
+  --bg-input: #0E1015;
+
+  --border-subtle: #232733;
+  --border-strong: #373E4F;
+  --border-focus: #E11D48;
+
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+
+  --accent-crimson: #E11D48;
+  --accent-crimson-hover: #BE123C;
+  --accent-crimson-subtle: rgba(225, 29, 72, 0.12);
+  --accent-gold: #D97706;
+  --accent-gold-subtle: rgba(217, 119, 6, 0.15);
+
+  --font-primary: 'Google Sans', 'Google Sans Text', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
 }
 
-/* Global styles */
-* {
+/* Reset Global */
+*, *::before, *::after {
   box-sizing: border-box;
-  font-family: var(--font-primary);
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-page);
+  background-color: var(--bg-canvas);
   color: var(--text-primary);
   font-family: var(--font-primary);
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-input, button, select, textarea {
+h1, h2, h3, h4 {
   font-family: var(--font-primary);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select, textarea {
+  font-family: var(--font-primary);
+  font-size: inherit;
+  color: inherit;
 }
 
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: var(--purple-600) !important;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  border-color: var(--border-focus) !important;
+  box-shadow: 0 0 0 2px var(--accent-crimson-subtle) !important;
 }
 
+/* Scrollbar sutil */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
 
+::-webkit-scrollbar-track {
+  background: var(--bg-canvas);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}

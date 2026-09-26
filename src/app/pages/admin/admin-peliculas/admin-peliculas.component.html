@@ -1,0 +1,16 @@
+<section class="admin-seccion">
+  <app-admin-peliculas-tabs
+    [active]="apartadoActivo()"
+    (change)="seleccionarApartado($event)"
+  ></app-admin-peliculas-tabs>
+
+  @if (apartadoActivo() === 'crear') {
+    <app-formulario-pelicula
+      (guardadoExitoso)="irAlListado()"
+    />
+  } @else {
+    <app-listado-peliculas
+      (editarSolicitado)="irAlFormulario()"
+    />
+  }
+</section>

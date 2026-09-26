@@ -1,0 +1,42 @@
+<a class="card-pelicula" [routerLink]="['/pelicula', pelicula().id]">
+  <div class="poster-frame">
+    @if (pelicula().imagenUrl) {
+      <img
+        class="poster-img"
+        [src]="pelicula().imagenUrl"
+        [alt]="'Póster de ' + pelicula().titulo"
+        loading="lazy"
+      />
+    } @else {
+      <div class="poster-fallback">
+        <span class="fallback-icon">🎬</span>
+        <span class="fallback-title">{{ pelicula().titulo }}</span>
+      </div>
+    }
+
+    <!-- Badges sobre el poster -->
+    <div class="poster-tags">
+      <span class="badge-age">{{ pelicula().clasificacion }}</span>
+      @if (pelicula().preventaActiva) {
+        <span class="badge-preventa">PREVENTA</span>
+      }
+    </div>
+  </div>
+
+  <div class="card-body">
+    <div class="card-meta">
+      <span class="meta-genre">{{ pelicula().genero || 'Estreno' }}</span>
+      <span class="meta-dot">•</span>
+      <span class="meta-duration">{{ pelicula().duracionMin }} MIN</span>
+    </div>
+
+    <h3 class="card-title">{{ pelicula().titulo }}</h3>
+
+    <p class="card-synopsis">{{ pelicula().sinopsis }}</p>
+
+    <div class="card-cta">
+      <span>Ver ficha y funciones</span>
+      <span class="cta-arrow">→</span>
+    </div>
+  </div>
+</a>

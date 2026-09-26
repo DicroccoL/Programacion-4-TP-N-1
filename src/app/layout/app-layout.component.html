@@ -1,0 +1,79 @@
+<div class="app-layout">
+  <header class="app-navbar">
+    <div class="nav-container">
+      <a routerLink="/" class="nav-brand">
+        <span class="brand-monogram">W</span>
+        <span class="brand-title">WILDECINEMAS</span>
+      </a>
+
+      <nav class="nav-links">
+        @if (!authService.isAdmin()) {
+          <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+            Cartelera
+          </a>
+        }
+        <a *soloAdmin routerLink="/admin" routerLinkActive="active" class="nav-link-admin">
+          Panel de Control
+        </a>
+      </nav>
+
+      <div class="nav-auth">
+        @if (authService.isLoggedIn()) {
+          <div class="user-chip">
+            <span class="user-status-dot"></span>
+            <span class="user-name">{{ authService.currentProfile()?.nombre || 'Usuario' }}</span>
+          </div>
+          <button type="button" class="btn-nav btn-ghost" (click)="cerrarSesion()">
+            Salir
+          </button>
+        } @else {
+          <a
+            routerLink="/login"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="btn-nav btn-primary"
+          >
+            Acceder
+          </a>
+        }
+      </div>
+    </div>
+  </header>
+
+  <main class="app-main">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-col brand-col">
+        <span class="footer-brand">WILDECINEMAS</span>
+        <p class="footer-desc">
+          Proyecciones en 2D, 3D y 4D. Salas equipadas con sonido inmersivo y filas exclusivas VIP y accesibles.
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <span class="footer-heading">PROGRAMACIÓN</span>
+        <ul class="footer-list">
+          <li><a routerLink="/">En Cartelera</a></li>
+          <li><a routerLink="/">Próximos Estrenos</a></li>
+          <li><a routerLink="/login">Programa de Puntos</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <span class="footer-heading">INFORMACIÓN</span>
+        <ul class="footer-list">
+          <li><span>Horarios: Lun a Dom de 14:00 a 01:00</span></li>
+          <li><span>TP Programación IV — 2026 C2</span></li>
+          <li><span class="dev-tag">Desarrollo: Lucas Di Crocco</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 WildeCinemas. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+</div>
