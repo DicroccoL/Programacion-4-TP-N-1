@@ -88,6 +88,7 @@ export class PeliculasService {
     const { error } = await this.authService.client
       .from('peliculas')
       .delete()
+//No utilizar Delete utilizar Bajas logicas
       .eq('id', id);
 
     if (error) {
