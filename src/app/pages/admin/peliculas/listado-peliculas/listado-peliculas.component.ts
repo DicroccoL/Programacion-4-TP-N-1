@@ -23,4 +23,3 @@ export class ListadoPeliculasComponent {
     this.crud.eliminar(pelicula);
   }
 }
-

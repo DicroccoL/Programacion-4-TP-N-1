@@ -36,102 +36,238 @@ Si viene con `?tab=register` en la URL, abre el registro directamente.
 
 ---
 
-## Sección Admin — Cómo funciona
+## Sección Admin — flujo actual
 
-> Esta es la parte que genera más dudas. Se explica de adentro hacia afuera.
+La parte admin está organizada por secciones. La pantalla principal del panel es `AdminComponent` y desde ahí se decide qué bloque mostrar.
 
-### Capas (de menor a mayor)
+### 1) Panel principal del admin
 
-```
-┌─────────────────────────────────────────────────────┐
-│  AdminComponent                                     │
-│  (elige qué sección mostrar: Películas, Salas, ...) │
-│                                                     │
-│  └─ AdminPeliculasComponent                         │
-│     (elige qué pestaña mostrar: Crear / Listar)     │
-│                                                     │
-│     ├─ AdminPeliculasTabsComponent  ← solo botones  │
-│     ├─ FormularioPeliculaComponent  ← solo el form  │
-│     └─ ListadoPeliculasComponent    ← solo la tabla │
-└─────────────────────────────────────────────────────┘
-```
+Archivo:
 
-### ¿Por qué existe PeliculasCrudService?
+- `src/app/pages/admin/admin.component.ts`
+- `src/app/pages/admin/admin.component.html`
 
-Antes, `AdminPeliculasComponent` tenía **toda** la lógica: las llamadas al API, el estado de loading, el formulario, los mensajes de error — todo. Y lo pasaba a los hijos via `@Input`.
+Responsabilidad:
 
-Ahora ese estado vive en el **service** y los componentes lo leen directamente.
+- mostrar el header con las pestañas (`Películas`, `Salas`, `Funciones`, etc.)
+- guardar la sección activa (`seccionActiva`)
+- renderizar el contenido de la sección seleccionada
 
-```
-PeliculasCrudService  (providedIn: 'root')
-  ├─ peliculas()        ← lista actual
-  ├─ cargando()         ← spinner
-  ├─ guardando()        ← botón deshabilitado
-  ├─ mensaje()          ← "Película creada ✓"
-  ├─ error()            ← "No se pudo guardar"
-  ├─ formulario()       ← campos del form
-  └─ peliculaEditandoId() ← null = crear, id = editar
-```
+Ejemplo:
 
-Cada componente hijo **inyecta el service** y lee/escribe directamente. No hay `@Input` de estado.
-
-### Responsabilidad de cada pieza
-
-| Archivo | Hace una sola cosa |
-|--------|-------------------|
-| `AdminComponent` | Muestra las pestañas del panel (Películas / Salas / ...) |
-| `AdminPeliculasComponent` | Cambia entre "Crear" y "Listar" |
-| `AdminPeliculasTabsComponent` | Renderiza los dos botones de tab |
-| `FormularioPeliculaComponent` | Muestra el form, llama `crud.guardar()` |
-| `ListadoPeliculasComponent` | Muestra la tabla, llama `crud.eliminar()` o `crud.iniciarEdicion()` |
-| `PeliculasCrudService` | Toda la lógica: API calls + estado reactivo (signals) |
-
-### Flujo de una acción: "Editar película"
-
-```
-1. Usuario hace click en "Editar" en la tabla
-2. ListadoPeliculasComponent.editar(pelicula)
-      → crud.iniciarEdicion(pelicula)   // carga datos al formulario
-      → emite: editarSolicitado
-3. AdminPeliculasComponent.irAlFormulario()
-      → apartadoActivo.set('crear')     // cambia la pestaña
-4. FormularioPeliculaComponent se muestra
-      → lee crud.formulario()           // ya tiene los datos de la película
-5. Usuario edita y presiona "Guardar"
-6. FormularioPeliculaComponent.enviar()
-      → await crud.guardar()            // llama al API
-      → emite: guardadoExitoso
-7. AdminPeliculasComponent.irAlListado()
-      → apartadoActivo.set('listar')    // vuelve a la tabla
+```html
+@switch (seccionActiva()) {
+  @case ('peliculas') {
+    <app-admin-peliculas />
+  }
+}
 ```
 
 ---
 
-## Estructura de carpetas (solo admin)
+### 2) Subsección de películas
 
+Archivo:
+
+- `src/app/pages/admin/peliculas/admin-peliculas.component.ts`
+- `src/app/pages/admin/peliculas/admin-peliculas.component.html`
+
+Responsabilidad:
+
+- orquestar el CRUD de películas
+- decidir si se muestra formulario o listado
+- mantener el estado de la pestaña interna (`crear` / `listar`)
+
+El componente principal del CRUD es:
+
+```ts
+readonly apartadoActivo = signal<'crear' | 'listar'>('crear');
 ```
-pages/admin/
-├── admin.component.*          ← panel principal con tabs globales
-└── admin-peliculas/
-    ├── admin-peliculas.component.*        ← orquesta tabs
-    ├── admin-peliculas-tabs/
-    │   └── admin-peliculas-tabs.component.*  ← botones Crear/Listar
-    ├── formulario-pelicula/
-    │   └── formulario-pelicula.component.*   ← form de alta/edición
-    └── listado-peliculas/
-        └── listado-peliculas.component.*     ← tabla de películas
 
-core/services/
-├── peliculas.service.ts       ← HTTP calls al backend
-└── peliculas-crud.service.ts  ← estado del CRUD (signals)
+Cuando cambia la pestaña, el padre decide qué hijo mostrar.
+
+---
+
+### 3) Pestañas internas de películas
+
+Archivo:
+
+- `src/app/pages/admin/peliculas/admin-peliculas-tabs/admin-peliculas-tabs.component.ts`
+- `src/app/pages/admin/peliculas/admin-peliculas-tabs/admin-peliculas-tabs.component.html`
+
+Responsabilidad:
+
+- mostrar solo dos botones: `Crear película` y `Películas cargadas`
+- emitir el evento `change` cuando el usuario cambia de pestaña
+
+No tiene lógica de negocio ni acceso a los datos reales; solo delega a la capa superior.
+
+---
+
+### 4) Formulario de película
+
+Archivo:
+
+- `src/app/pages/admin/peliculas/formulario-pelicula/formulario-pelicula.component.ts`
+- `src/app/pages/admin/peliculas/formulario-pelicula/formulario-pelicula.component.html`
+
+Responsabilidad:
+
+- mostrar el formulario de alta/edición
+- consumir el servicio del CRUD para guardar
+- emitir `guardadoExitoso` al padre cuando termina bien
+
+La parte clave es:
+
+```ts
+const ok = await this.crud.guardar();
+if (ok) this.guardadoExitoso.emit();
+```
+
+El formulario no guarda en un estado local propio; usa el service como fuente única de datos del módulo.
+
+---
+
+### 5) Listado de películas
+
+Archivo:
+
+- `src/app/pages/admin/peliculas/listado-peliculas/listado-peliculas.component.ts`
+- `src/app/pages/admin/peliculas/listado-peliculas/listado-peliculas.component.html`
+
+Responsabilidad:
+
+- listar las películas actuales (`crud.peliculas()`)
+- mostrar mensajes de carga/error
+- editar una película con `crud.iniciarEdicion(pelicula)`
+- eliminar una película con `crud.eliminar(pelicula)`
+
+Cuando se quiere editar:
+
+```ts
+editar(pelicula: Pelicula): void {
+  this.crud.iniciarEdicion(pelicula);
+  this.editarSolicitado.emit();
+}
+```
+
+Eso hace que el padre cambie de pestaña y muestre el formulario con los datos ya cargados.
+
+---
+
+## Servicio CRUD centralizado
+
+Archivo:
+
+- `src/app/core/services/peliculas-crud.service.ts`
+
+Este service concentra la lógica del módulo de películas. Tiene la responsabilidad de manejar:
+
+- `peliculas()` → lista actual de películas
+- `cargando()` → estado de carga
+- `error()` → errores del servicio
+- `mensaje()` → mensajes de éxito/error para mostrar en UI
+- `formulario()` → estado del formulario actual
+- `peliculaEditandoId()` → si se está editando, guarda el id; si es `null`, se está creando
+- `cargarPeliculas()`, `guardar()`, `eliminar()`, `iniciarEdicion()`, `limpiarEdicion()`
+
+Es decir, el service es la capa de estado compartido entre formulario y listado.
+
+---
+
+## ¿Por qué está distribuido así?
+
+La intención es separar responsabilidades:
+
+| Componente | Regla de responsabilidad |
+|-----------|-------------------------|
+| `AdminComponent` | navegación del panel general |
+| `AdminPeliculasComponent` | control del CRUD de películas |
+| `AdminPeliculasTabsComponent` | botones de selección |
+| `FormularioPeliculaComponent` | alta/edición |
+| `ListadoPeliculasComponent` | tabla y acciones |
+| `PeliculasCrudService` | estado, validaciones y llamadas al backend |
+
+Esto es una buena práctica en Angular cuando la lógica crece. La ventaja es que cada pieza hace una sola cosa y el estado queda centralizado.
+
+La desventaja es que el flujo puede parecer más complejo si no hay una explicación clara, porque la lógica no está en un solo archivo.
+
+---
+
+## Flujo completo: editar película
+
+```text
+1. Usuario hace click en Editar en el listado
+2. ListadoPeliculasComponent.editar(pelicula)
+   → this.crud.iniciarEdicion(pelicula)
+3. El service llena el formulario con los datos de la película
+4. Se emite `editarSolicitado`
+5. AdminPeliculasComponent.irAlFormulario()
+   → apartadoActivo.set('crear')
+6. Se renderiza FormularioPeliculaComponent
+7. El usuario modifica la película y presiona Guardar
+8. FormularioPeliculaComponent.enviar()
+   → await this.crud.guardar()
+9. El service actualiza la data
+10. El padre vuelve a la vista de listado
+```
+
+---
+
+## Flujo completo: crear película
+
+```text
+1. Usuario entra a la sección Películas
+2. AdminPeliculasComponent carga la lista
+3. El usuario elige "Crear película"
+4. Se muestra FormularioPeliculaComponent
+5. Completa campos
+6. Ejecuta crud.guardar()
+7. El service persiste la película
+8. Se emite guardadoExitoso
+9. Padre cambia a la pestaña "listar"
+10. Se muestra la lista actualizada
+```
+
+---
+
+## Estructura de carpetas actual
+
+```text
+src/app/
+├── core/
+│   └── services/
+│       ├── auth.service.ts
+│       ├── peliculas.service.ts
+│       └── peliculas-crud.service.ts
+│
+├── pages/
+│   ├── admin/
+│   │   ├── admin.component.*
+│   │   ├── README.md
+│   │   └── peliculas/
+│   │       ├── admin-peliculas.component.*
+│   │       ├── admin-peliculas-tabs/
+│   │       │   └── admin-peliculas-tabs.component.*
+│   │       ├── formulario-pelicula/
+│   │       │   └── formulario-pelicula.component.*
+│   │       └── listado-peliculas/
+│   │           └── listado-peliculas.component.*
+│   │
+│   ├── auth/
+│   ├── detalle-pelicula/
+│   └── inicio/
 ```
 
 ---
 
 ## Regla de oro
 
-> **Si necesitás agregar una nueva sección** (ej: Salas):
-> 1. Crear `admin-salas/` con la misma estructura que `admin-peliculas/`.
-> 2. Crear `salas-crud.service.ts` en `core/services/`.
-> 3. Agregar el case en `admin.component.html` y `admin.component.ts`.
-> 4. No tocar nada de películas.
+> Si se agrega una nueva sección del panel (por ejemplo `salas`, `funciones`, `candybar`), la estructura recomendada es:
+>
+> 1. crear una carpeta `src/app/pages/admin/<nombre-seccion>/`
+> 2. crear los subcomponentes dentro de esa carpeta
+> 3. crear un `*-crud.service.ts` si hace falta un estado compartido
+> 4. agregar la sección en `AdminComponent`
+
+Eso mantiene la arquitectura consistente y escalable.

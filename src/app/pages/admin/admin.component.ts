@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
-import { AdminPeliculasComponent } from './admin-peliculas/admin-peliculas.component';
+import { AdminPeliculasComponent } from './peliculas/admin-peliculas.component';
 
 export type SeccionAdmin =
   | 'peliculas'

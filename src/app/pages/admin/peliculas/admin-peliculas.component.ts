@@ -39,4 +39,3 @@ export class AdminPeliculasComponent implements OnInit {
     this.apartadoActivo.set('crear');
   }
 }
-
