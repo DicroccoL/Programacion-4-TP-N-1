@@ -101,50 +101,150 @@ Este service hace de "estado global del módulo" para películas. Tiene responsa
 - mantener qué película está siendo editada (`peliculaEditandoId()`)
 - limpiar la edición y preparar un nuevo formulario
 
-## 7. Flujo completo de un caso real
+## 7. Servicios de acceso a datos y autenticación
 
-### Crear película
+Además del CRUD de administración, hay dos servicios fundamentales que aparecen en la app y que cumplen funciones distintas.
 
-1. El usuario hace click en `Películas` en el admin.
-2. `AdminComponent` renderiza `app-admin-peliculas`.
-3. `AdminPeliculasComponent` carga películas con `crud.cargarPeliculas()`.
-4. El usuario está en la vista `crear`.
-5. Completa el formulario.
-6. `FormularioPeliculaComponent` llama a `crud.guardar()`.
-7. `PeliculasCrudService` valida y persiste la película.
-8. Si todo sale bien, emite `guardadoExitoso`.
-9. El padre cambia a la vista `listar`.
-10. El listado vuelve a mostrar la lista actualizada.
+### 7.1 `PeliculasService`
 
-### Editar película
+Archivo:
 
-1. En el listado, se presiona `Editar`.
-2. `ListadoPeliculasComponent` llama `crud.iniciarEdicion(pelicula)`.
-3. El service carga esa película en el formulario compartido.
-4. El padre cambia a la vista `crear`.
-5. El formulario se rellena con los datos.
-6. Cuando se guarda, `crud.guardar()` actualiza en lugar de crear una nueva.
+- `src/app/core/services/peliculas.service.ts`
 
-## 8. ¿Por qué está distribuido así?
+Este servicio es el que se encarga de consultar películas desde Supabase y devolver objetos del dominio de la app.
 
-Esta estructura intenta separar responsabilidades:
+Su responsabilidad no es controlar la UI ni el estado del panel de admin. Su trabajo es más técnico y de acceso a datos.
 
-- `AdminComponent`: controla navegación del panel
-- `AdminPeliculasComponent`: controla la vista interna del CRUD
-- `Tabs`: solo cambia entre `crear` y `listar`
-- `Formulario`: solo edita y envía
-- `Listado`: solo consume y muestra
-- `PeliculasCrudService`: concentra lógica compartida y estado
+#### ¿Qué hace?
 
-Es una buena práctica cuando hay más de una vista usando el mismo estado, o cuando la lógica de negocio empieza a crecer.
+- `obtenerTodas()`: trae todas las películas
+- `obtenerCartelera()`: trae solo las que tienen estado `EN_CARTELERA`
+- `obtenerProximamente()`: trae solo las que tienen estado `PROXIMAMENTE`
+- `obtenerPorId(id)`: trae una película por su id
+- `crear(datos)`: inserta una nueva película
+- `actualizar(id, datos)`: modifica una película existente
+- `eliminar(id)`: elimina una película
 
-La desventaja es que para alguien nuevo resulta más difícil seguir el flujo, porque la lógica está repartida entre varios archivos.
+#### ¿Dónde se usa?
+
+Se usa principalmente en la parte pública y en la lógica de lectura del sistema:
+
+- `InicioComponent` para mostrar cartelera y próximamente
+- `DetallePeliculaComponent` para mostrar datos de una película específica
+- `PeliculasCrudService` como capa base para guardar/editar/borrar, porque encapsula las operaciones reales con Supabase
+
+#### ¿Para qué se creó?
+
+Para separar la capa de acceso a datos de la capa de UI y de la capa de estado del CRUD.
+
+Es decir:
+
+- `PeliculasService` = "consulto y persisto datos de películas"
+- `PeliculasCrudService` = "gestión de estado del admin y UX del CRUD"
+
+#### Ejemplo conceptual
+
+```ts
+const peliculas = await this.peliculasService.obtenerCartelera();
+```
+
+Esto devuelve datos ya mapeados a la interfaz `Pelicula`, lista para usarse en una vista.
+
+---
+
+### 7.2 `AuthService`
+
+Archivo:
+
+- `src/app/core/services/auth.service.ts`
+
+Este servicio es el responsable de la autenticación del usuario con Supabase y del estado de sesión.
+
+#### ¿Qué hace?
+
+- crea el cliente de Supabase
+- inicializa la sesión actual
+- escucha cambios de login/logout
+- carga el perfil del usuario
+- hace login
+- hace registro
+- hace logout
+- expone señales reactivas como:
+  - `currentUser`
+  - `currentProfile`
+  - `isLoggedIn`
+  - `isAdmin`
+  - `isEmpleado`
+  - `isCliente`
+
+#### ¿Dónde se usa?
+
+Se usa en muchas partes de la app:
+
+- `AdminComponent` para mostrar el nombre del usuario actual y saber si es admin
+- `AuthComponent` / login / registro para iniciar sesión y crear usuarios
+- guards para restringir acceso a rutas privadas
+- cualquier vista que necesita saber si el usuario está logueado o qué rol tiene
+
+#### ¿Para qué se creó?
+
+Para centralizar toda la autenticación y el estado de sesión en un único punto.
+
+Sin este servicio, cada componente tendría que:
+
+- crear cliente de Supabase
+- leer sesión
+- validar roles
+- manejar login y logout
+- reaccionar a cambios de autenticación
+
+Eso rompería la separación de responsabilidades.
+
+#### Ejemplo conceptual
+
+```ts
+const perfil = this.authService.currentProfile();
+const esAdmin = this.authService.isAdmin();
+```
+
+Eso permite que la UI sepa si el usuario actual tiene permisos para entrar al admin.
+
+---
+
+## 8. Relación entre servicios
+
+Los tres servicios tienen roles distintos:
+
+- `AuthService`: autenticación y sesión del usuario
+- `PeliculasService`: acceso directo a la tabla de películas en Supabase
+- `PeliculasCrudService`: lógica de estado y UX del CRUD del admin para películas
+
+En otras palabras:
+
+- `AuthService` responde a: "¿quién es el usuario?"
+- `PeliculasService` responde a: "¿qué películas existen?"
+- `PeliculasCrudService` responde a: "¿cómo administra el admin esas películas?"
 
 ## 9. Recomendación
 
-Si este módulo se mantiene pequeño, se puede simplificar un poco:
+La separación es correcta porque cada servicio resuelve un problema distinto. El punto importante es no mezclar responsabilidades:
 
-- dejar la lógica en el componente padre `AdminPeliculasComponent`
-- o mantener el servicio pero documentar este flujo
+- no poner lógica de autenticación dentro del CRUD
+- no poner validaciones del admin dentro de `PeliculasService`
+- no poner UI del formulario dentro de `AuthService`
 
-La forma actual es válida y bastante típica en Angular, pero requiere claridad en la arquitectura para que el flujo sea entendible.
+Cada servicio debe manejar una capa de la aplicación.
+
+## 10. Flujo completo del admin con servicios
+
+```text
+1. Usuario entra a /admin
+2. AuthService sabe si hay sesión activa y qué rol tiene
+3. AdminComponent renderiza la sección correspondiente
+4. Si es Películas, AdminPeliculasComponent llama a PeliculasCrudService
+5. PeliculasCrudService usa PeliculasService para cargar/guardar/editar/borrar
+6. Formulario y Listado leen/escriben el mismo estado del service
+7. Todo el flujo queda centralizado y reutilizable
+```
+
+Esta separación es práctica y esperable en Angular, pero solo se vuelve clara si se explica bien la diferencia entre los servicios.

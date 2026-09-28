@@ -1,0 +1,88 @@
+<section class="resenias-section" aria-labelledby="resenias-title">
+  <header class="resenias-header">
+    <div>
+      <h2 id="resenias-title">Reseñas y calificaciones</h2>
+      @if (!cargando() && !errorCarga()) {
+        <p class="resenias-promedio">
+          <span class="resenias-star" aria-hidden="true">★</span>
+          @if (resenias().length) {
+            {{ promedio() | number: '1.1-1' }} / 5 · {{ resenias().length }} reseñas
+          } @else {
+            Aún no hay reseñas
+          }
+        </p>
+      }
+    </div>
+  </header>
+
+  @if (authService.currentUser()) {
+    <form class="resenia-form" (ngSubmit)="guardar()">
+      <h3>{{ reseniaPropia() ? 'Editá tu reseña' : 'Dejá tu reseña' }}</h3>
+      <fieldset class="selector-estrellas" [disabled]="guardando()">
+        <legend>Tu puntuación</legend>
+        @for (estrella of estrellas; track estrella) {
+          <button
+            type="button"
+            class="estrella-boton"
+            [class.seleccionada]="estrella <= puntaje()"
+            [attr.aria-label]="estrella + (estrella === 1 ? ' estrella' : ' estrellas')"
+            [attr.aria-pressed]="puntaje() === estrella"
+            (click)="seleccionarPuntaje(estrella)"
+          >★</button>
+        }
+      </fieldset>
+      <label class="comentario-campo">
+        <span>Comentario (opcional, hasta 500 caracteres)</span>
+        <textarea
+          name="comentario"
+          rows="3"
+          maxlength="500"
+          placeholder="¿Qué te pareció la película?"
+          [ngModel]="comentario()"
+          (ngModelChange)="comentario.set($event)"
+        ></textarea>
+      </label>
+      @if (error()) {
+        <p class="resenia-error" role="alert">{{ error() }}</p>
+      }
+      @if (mensaje()) {
+        <p class="resenia-mensaje" role="status">{{ mensaje() }}</p>
+      }
+      <button class="btn-resenia" type="submit" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : reseniaPropia() ? 'Guardar cambios' : 'Publicar reseña' }}
+      </button>
+    </form>
+  } @else {
+    <p class="resenias-login">
+      <a routerLink="/login">Iniciá sesión</a> para calificar y dejar una reseña.
+    </p>
+  }
+
+  @if (cargando()) {
+    <p class="resenias-estado">Cargando reseñas…</p>
+  } @else if (errorCarga()) {
+    <p class="resenias-error" role="alert">{{ errorCarga() }}</p>
+  } @else if (resenias().length === 0) {
+    <p class="resenias-estado">Sé la primera persona en compartir su opinión.</p>
+  } @else {
+    <div class="resenias-lista">
+      @for (resenia of resenias(); track resenia.id) {
+        <article class="resenia-item">
+          <div class="resenia-meta">
+            <span class="resenia-stars" [attr.aria-label]="resenia.puntaje + ' de 5 estrellas'">
+              @for (estrella of estrellas; track estrella) {
+                <span [class.inactiva]="estrella > resenia.puntaje" aria-hidden="true">★</span>
+              }
+            </span>
+            @if (resenia.createdAt) {
+              <time [dateTime]="resenia.createdAt">{{ resenia.createdAt | date: 'dd/MM/yyyy' }}</time>
+            }
+          </div>
+          @if (resenia.comentario) {
+            <p>{{ resenia.comentario }}</p>
+          }
+        </article>
+      }
+    </div>
+  }
+</section>

@@ -11,20 +11,63 @@ import {
 @Injectable({
   providedIn: 'root',
 })
+/**
+ * Servicio central de autenticación y sesión del usuario.
+ *
+ * Se encarga de conectarse con Supabase Auth, mantener el usuario actual,
+ * cargar su perfil y exponer estados reactivos para que la UI pueda decidir
+ * si mostrar login, admin, empleado o cliente.
+ *
+ * Se usa desde:
+ * - formularios de login/registro
+ * - guards de rutas protegidas
+ * - componentes del admin para validar roles
+ * - cualquier pantalla que necesite saber si el usuario está autenticado
+ */
 export class AuthService {
   private supabase: SupabaseClient;
   private readonly authReady: Promise<void>;
 
   // Estado reactivo con Signals
+  /**
+   * Usuario autenticado de Supabase Auth.
+   */
   readonly currentUser = signal<User | null>(null);
+
+  /**
+   * Perfil del usuario cargado desde la tabla `perfiles`.
+   */
   readonly currentProfile = signal<PerfilUsuario | null>(null);
+
+  /**
+   * Indica si hay una operación de autenticación en curso.
+   */
   readonly isLoading = signal<boolean>(false);
 
   // Señales derivadas (computed)
+  /**
+   * Verdadero si el usuario está logueado.
+   */
   readonly isLoggedIn = computed(() => !!this.currentUser());
+
+  /**
+   * Rol del usuario actual.
+   */
   readonly userRole = computed<RolUsuario | null>(() => this.currentProfile()?.rol ?? null);
+
+  /**
+   * Verdadero cuando el perfil del usuario es admin.
+   */
   readonly isAdmin = computed(() => this.userRole() === 'admin');
+
+  /**
+   * Verdadero cuando el perfil del usuario es empleado.
+   */
   readonly isEmpleado = computed(() => this.userRole() === 'empleado');
+
+  /**
+   * Verdadero cuando el perfil del usuario es cliente.
+   */
   readonly isCliente = computed(() => this.userRole() === 'cliente');
 
   constructor() {
@@ -36,14 +79,24 @@ export class AuthService {
     this.authReady = this.initAuth();
   }
 
+  /**
+   * Espera a que la inicialización de sesión termine.
+   * Se usa para asegurar que el estado de auth está listo antes de navegar.
+   */
   async whenReady(): Promise<void> {
     await this.authReady;
   }
 
+  /**
+   * Cliente de Supabase disponible para otras capas que necesiten acceso directo.
+   */
   get client(): SupabaseClient {
     return this.supabase;
   }
 
+  /**
+   * Inicializa la sesión existente y registra un listener para cambios de auth.
+   */
   private async initAuth(): Promise<void> {
     try {
       const { data: { session } } = await this.supabase.auth.getSession();
@@ -68,7 +121,8 @@ export class AuthService {
   }
 
   /**
-   * Carga el perfil del usuario desde la tabla 'perfiles'
+   * Carga el perfil del usuario desde la tabla `perfiles`.
+   * Permite conocer nombre, rol, puntos, etc., sin duplicar lógica en cada pantalla.
    */
   private async loadUserProfile(user: User): Promise<void> {
     try {

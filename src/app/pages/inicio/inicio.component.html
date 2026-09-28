@@ -29,16 +29,56 @@
     
   </section>
 
-  <!-- Sección 01: Cartelera -->
+  <!-- Espacio preparado para el ranking de películas más vendidas -->
+  <section class="seccion-catalogo">
+    <div class="seccion-header">
+      <div class="header-titulos">
+        <span class="seccion-num">01 / RANKING</span>
+        <h2 class="seccion-title">Las más vendidas</h2>
+      </div>
+      <p class="seccion-bajada">Las favoritas del público.</p>
+    </div>
+    <div class="estado-caja">
+      <p>El ranking estará disponible cuando se registren las primeras ventas.</p>
+    </div>
+  </section>
+
+  <!-- Sección 02: Cartelera -->
   <section id="cartelera" class="seccion-catalogo">
     <div class="seccion-header">
       <div class="header-titulos">
-        <span class="seccion-num">01 / CARTELERA</span>
+        <span class="seccion-num">02 / CARTELERA</span>
         <h2 class="seccion-title">Películas en Exhibición</h2>
       </div>
-      <p class="seccion-bajada">
-        Funciones con horarios programados y 30 minutos de limpieza garantizada entre sesiones.
-      </p>
+      <div class="seccion-bajada">
+        <p>Funciones con horarios programados y 30 minutos de limpieza garantizada entre sesiones.</p>
+      </div>
+    </div>
+
+    <div class="catalogo-filtros">
+      <label class="filtro-campo">
+        <span>Buscar por título</span>
+        <input
+          type="search"
+          placeholder="Ej.: El Padrino"
+          aria-label="Buscar películas por título"
+          [value]="busqueda()"
+          (input)="busqueda.set($any($event.target).value)"
+        />
+      </label>
+      <label class="filtro-campo">
+        <span>Género</span>
+        <select
+          aria-label="Filtrar películas por género"
+          [value]="generoSeleccionado()"
+          (change)="generoSeleccionado.set($any($event.target).value)"
+        >
+          <option value="">Todos los géneros</option>
+          @for (genero of generosDisponibles(); track genero) {
+            <option [value]="genero">{{ genero }}</option>
+          }
+        </select>
+      </label>
     </div>
 
     @if (cargando()) {
@@ -50,14 +90,21 @@
       <div class="estado-caja estado-error">
         <p>{{ error() }}</p>
       </div>
-    } @else if (peliculas().length === 0) {
+    } @else if (peliculasFiltradas().length === 0) {
       <div class="estado-caja">
-        <p>No hay títulos en cartelera en este momento.</p>
+        @if (peliculas().length === 0) {
+          <p>No hay títulos en cartelera en este momento.</p>
+        } @else {
+          <p>No hay películas que coincidan con la búsqueda y el género seleccionados.</p>
+        }
       </div>
     } @else {
       <div class="grid-peliculas">
-        @for (pelicula of peliculas(); track pelicula.id) {
-          <app-tarjeta-pelicula [pelicula]="pelicula" />
+        @for (pelicula of peliculasFiltradas(); track pelicula.id) {
+          <app-tarjeta-pelicula
+            [pelicula]="pelicula"
+            [resumenResenias]="resumenesResenias()[pelicula.id] ?? resumenVacio"
+          />
         }
       </div>
     }
@@ -67,7 +114,7 @@
   <section class="seccion-catalogo seccion-proximamente">
     <div class="seccion-header">
       <div class="header-titulos">
-        <span class="seccion-num">02 / PRÓXIMOS ESTRENOS</span>
+        <span class="seccion-num">03 / PRÓXIMOS ESTRENOS</span>
         <h2 class="seccion-title">Preventas y Próximamente</h2>
       </div>
       <p class="seccion-bajada">
@@ -86,7 +133,10 @@
     } @else {
       <div class="grid-peliculas">
         @for (pelicula of proximamente(); track pelicula.id) {
-          <app-tarjeta-pelicula [pelicula]="pelicula" />
+          <app-tarjeta-pelicula
+            [pelicula]="pelicula"
+            [resumenResenias]="resumenesResenias()[pelicula.id] ?? resumenVacio"
+          />
         }
       </div>
     }

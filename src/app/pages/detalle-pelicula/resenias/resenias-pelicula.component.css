@@ -1,0 +1,133 @@
+.resenias-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.resenias-header h2,
+.resenia-form h3 {
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.resenias-promedio {
+  margin-top: 0.35rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.resenias-star,
+.estrella-boton,
+.resenia-stars {
+  color: var(--accent-gold);
+}
+
+.resenia-form,
+.resenia-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  padding: 1.25rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+}
+
+.selector-estrellas {
+  display: flex;
+  gap: 0.2rem;
+  padding: 0;
+  border: 0;
+}
+
+.selector-estrellas legend,
+.comentario-campo span {
+  margin-bottom: 0.4rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+.estrella-boton {
+  padding: 0.1rem 0.25rem;
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1.6rem;
+}
+
+.estrella-boton.seleccionada,
+.resenia-stars {
+  color: var(--accent-gold);
+}
+
+.comentario-campo {
+  display: flex;
+  flex-direction: column;
+}
+
+.comentario-campo textarea {
+  width: 100%;
+  padding: 0.75rem;
+  color: var(--text-primary);
+  background: #0e1015;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font: inherit;
+  resize: vertical;
+}
+
+.btn-resenia {
+  align-self: flex-start;
+  padding: 0.65rem 1rem;
+  color: #fff;
+  background: var(--accent-crimson);
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-resenia:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.resenias-login,
+.resenias-estado,
+.resenia-item p {
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.resenias-login a {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.resenias-lista {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.resenia-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.resenia-stars .inactiva {
+  color: var(--border-strong);
+}
+
+.resenia-error {
+  color: #f87171;
+}
+
+.resenia-mensaje {
+  color: #86efac;
+}

@@ -32,6 +32,19 @@
 
     <h3 class="card-title">{{ pelicula().titulo }}</h3>
 
+    <div class="rating-summary" aria-label="Puntuación de usuarios">
+      @if (resumenResenias().total > 0) {
+        <span class="rating-stars" aria-hidden="true">★</span>
+        <span>{{ resumenResenias().promedio | number: '1.1-1' }}</span>
+        <span class="rating-count">
+          ({{ resumenResenias().total }} {{ resumenResenias().total === 1 ? 'reseña' : 'reseñas' }})
+        </span>
+      } @else {
+        <span class="rating-stars" aria-hidden="true">☆</span>
+        <span class="rating-count">Sin reseñas</span>
+      }
+    </div>
+
     <p class="card-synopsis">{{ pelicula().sinopsis }}</p>
 
     <div class="card-cta">

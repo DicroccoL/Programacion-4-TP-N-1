@@ -2,11 +2,12 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Pelicula } from '../../models/pelicula.model';
 import { PeliculasService } from '../../core/services/peliculas.service';
+import { ReseniasPeliculaComponent } from './resenias/resenias-pelicula.component';
 
 @Component({
   selector: 'app-detalle-pelicula',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, ReseniasPeliculaComponent],
   templateUrl: './detalle-pelicula.component.html',
   styleUrl: './detalle-pelicula.component.css',
 })

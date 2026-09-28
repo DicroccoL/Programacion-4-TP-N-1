@@ -5,9 +5,24 @@ import { AuthService } from './auth.service';
 @Injectable({
   providedIn: 'root',
 })
+/**
+ * Servicio de acceso a datos para películas.
+ *
+ * Se encarga de hablar directamente con Supabase para consultar y persistir
+ * la entidad `peliculas`. Su responsabilidad es leer/escribir datos, no
+ * manejar la UI ni el estado del panel de administración.
+ *
+ * Se usa desde:
+ * - componentes de la parte pública (inicio, detalle)
+ * - `PeliculasCrudService`, que agrega el estado reactivo del CRUD del admin
+ */
 export class PeliculasService {
   constructor(private readonly authService: AuthService) {}
 
+  /**
+   * Devuelve todas las películas registradas, ordenadas por fecha de estreno.
+   * Se usa cuando se necesitan consultar todos los registros del catálogo.
+   */
   async obtenerTodas(): Promise<Pelicula[]> {
     const { data, error } = await this.authService.client
       .from('peliculas')
@@ -21,6 +36,10 @@ export class PeliculasService {
     return (data ?? []).map((pelicula) => this.mapearPelicula(pelicula));
   }
 
+  /**
+   * Devuelve solo las películas que están actualmente en cartelera.
+   * Se usa en la pantalla principal para mostrar la sección de cartelera.
+   */
   async obtenerCartelera(): Promise<Pelicula[]> {
     const { data, error } = await this.authService.client
       .from('peliculas')
@@ -35,6 +54,10 @@ export class PeliculasService {
     return (data ?? []).map((pelicula) => this.mapearPelicula(pelicula));
   }
 
+  /**
+   * Devuelve las películas próximas a estrenarse.
+   * Se usa para la sección "Próximamente" del inicio.
+   */
   async obtenerProximamente(): Promise<Pelicula[]> {
     const { data, error } = await this.authService.client
       .from('peliculas')
@@ -49,6 +72,10 @@ export class PeliculasService {
     return (data ?? []).map((pelicula) => this.mapearPelicula(pelicula));
   }
 
+  /**
+   * Busca una película por su identificador.
+   * Se usa en páginas de detalle o para preparar edición de un registro.
+   */
   async obtenerPorId(id: string): Promise<Pelicula> {
     const { data, error } = await this.authService.client
       .from('peliculas')
@@ -63,6 +90,10 @@ export class PeliculasService {
     return this.mapearPelicula(data);
   }
 
+  /**
+   * Crea una nueva película en Supabase.
+   * Se usa desde el CRUD del admin cuando se quiere registrar una película.
+   */
   async crear(datos: CrearPeliculaDTO): Promise<void> {
     const { error } = await this.authService.client
       .from('peliculas')
@@ -73,6 +104,10 @@ export class PeliculasService {
     }
   }
 
+  /**
+   * Actualiza una película existente por id.
+   * Se usa cuando el admin modifica una película ya creada.
+   */
   async actualizar(id: string, datos: CrearPeliculaDTO): Promise<void> {
     const { error } = await this.authService.client
       .from('peliculas')
@@ -84,6 +119,10 @@ export class PeliculasService {
     }
   }
 
+  /**
+   * Elimina una película por id.
+   * Se usa desde el listado del panel administrativo.
+   */
   async eliminar(id: string): Promise<void> {
     const { error } = await this.authService.client
       .from('peliculas')
@@ -96,6 +135,10 @@ export class PeliculasService {
     }
   }
 
+  /**
+   * Convierte un registro de Supabase a la estructura interna `Pelicula`.
+   * Centraliza el mapeo entre nombres de columnas de la base y el modelo de la app.
+   */
   private mapearPelicula(pelicula: Record<string, unknown>): Pelicula {
     return {
       id: String(pelicula['id']),
@@ -127,6 +170,10 @@ export class PeliculasService {
     };
   }
 
+  /**
+   * Ajusta el payload antes de insertar/actualizar en Supabase.
+   * Convierte los nombres del modelo de app al formato que usa la base.
+   */
   private formatearParaSupabase(datos: CrearPeliculaDTO) {
     return {
       titulo: datos.titulo.trim(),

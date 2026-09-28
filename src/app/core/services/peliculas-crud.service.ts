@@ -39,9 +39,16 @@ export class PeliculasCrudService {
 
   // ─── Crear / Actualizar ─────────────────────────────────────────────────────
   async guardar(): Promise<boolean> {
-    this.guardando.set(true);
     this.error.set('');
     this.mensaje.set('');
+
+    const errorValidacion = this.validarFormulario();
+    if (errorValidacion) {
+      this.error.set(errorValidacion);
+      return false;
+    }
+
+    this.guardando.set(true);
     try {
       const id = this.peliculaEditandoId();
       if (id) {
@@ -108,6 +115,49 @@ export class PeliculasCrudService {
       clasificacion: 'ATP', estado: 'EN_CARTELERA',
       preventaActiva: false, precioPreventa: null, fechaEstreno: null,
     };
+  }
+
+  private validarFormulario(): string | null {
+    const formulario = this.formulario();
+    const textosObligatorios = [
+      formulario.titulo,
+      formulario.genero,
+      formulario.sinopsis,
+      formulario.imagenUrl,
+    ];
+
+    if (textosObligatorios.some((valor) => typeof valor !== 'string' || !valor.trim())) {
+      return 'Completá el título, género, sinopsis y URL de imagen.';
+    }
+
+    const duracion = Number(formulario.duracionMin);
+    if (!Number.isInteger(duracion) || duracion < 1) {
+      return 'La duración debe ser un número entero mayor que cero.';
+    }
+
+    try {
+      const url = new URL(formulario.imagenUrl.trim());
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+        return 'La URL de imagen debe comenzar con http:// o https://.';
+      }
+    } catch {
+      return 'Ingresá una URL válida para la imagen.';
+    }
+
+    if (!['ATP', '+13', '+18'].includes(formulario.clasificacion)) {
+      return 'Seleccioná una clasificación válida.';
+    }
+    if (!this.estados.includes(formulario.estado)) {
+      return 'Seleccioná un estado válido para la película.';
+    }
+    if (formulario.preventaActiva) {
+      const precio = Number(formulario.precioPreventa);
+      if (!Number.isFinite(precio) || precio <= 0) {
+        return 'Ingresá un precio de preventa mayor que cero.';
+      }
+    }
+
+    return null;
   }
 
   private mensajeError(e: unknown, fallback: string): string {

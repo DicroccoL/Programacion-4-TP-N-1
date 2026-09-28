@@ -73,6 +73,38 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 2px var(--accent-crimson-subtle) !important;
 }
 
+.inicio-page .catalogo-filtros {
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) minmax(180px, 1fr);
+  gap: 1rem;
+  max-width: 720px;
+}
+
+.inicio-page .filtro-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+}
+
+.inicio-page .filtro-campo input,
+.inicio-page .filtro-campo select {
+  width: 100%;
+  padding: 0.7rem 0.8rem;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  font: inherit;
+}
+
+@media (max-width: 560px) {
+  .inicio-page .catalogo-filtros {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Scrollbar sutil */
 ::-webkit-scrollbar {
   width: 8px;

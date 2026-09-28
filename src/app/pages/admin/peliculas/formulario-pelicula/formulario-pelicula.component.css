@@ -63,6 +63,18 @@
   transition: border-color 0.15s ease;
 }
 
+.campo input[aria-invalid="true"],
+.campo select[aria-invalid="true"],
+.campo textarea[aria-invalid="true"] {
+  border-color: #F87171;
+}
+
+.error-campo {
+  color: #F87171;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
 .campo-check {
   display: flex;
   align-items: center;

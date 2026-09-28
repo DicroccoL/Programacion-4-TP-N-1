@@ -127,6 +127,23 @@
   transition: color 0.15s ease;
 }
 
+.rating-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+}
+
+.rating-stars {
+  color: var(--accent-gold);
+  font-size: 1rem;
+}
+
+.rating-count {
+  color: var(--text-muted);
+}
+
 .card-pelicula:hover .card-title {
   color: #ffffff;
 }
