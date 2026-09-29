@@ -69,13 +69,14 @@
       @for (resenia of resenias(); track resenia.id) {
         <article class="resenia-item">
           <div class="resenia-meta">
+            <span class="resenia-autor">{{ resenia.nombreAutor }}</span>
             <span class="resenia-stars" [attr.aria-label]="resenia.puntaje + ' de 5 estrellas'">
               @for (estrella of estrellas; track estrella) {
                 <span [class.inactiva]="estrella > resenia.puntaje" aria-hidden="true">★</span>
               }
             </span>
             @if (resenia.createdAt) {
-              <time [dateTime]="resenia.createdAt">{{ resenia.createdAt | date: 'dd/MM/yyyy' }}</time>
+              <time [dateTime]="resenia.createdAt">{{ resenia.createdAt | fechaArgentina: true }}</time>
             }
           </div>
           @if (resenia.comentario) {

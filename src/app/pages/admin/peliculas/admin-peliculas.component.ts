@@ -14,7 +14,7 @@ import { AdminPeliculasTabsComponent } from './admin-peliculas-tabs/admin-pelicu
 export class AdminPeliculasComponent implements OnInit {
   private readonly crud = inject(PeliculasCrudService);
 
-  /** Solo gestiona qué pestaña está visible. Toda la lógica CRUD vive en el service. */
+  /** Solo gestiona qué pestaña está visible. La lógica de altas, consultas y cambios está en el servicio. */
   readonly apartadoActivo = signal<'crear' | 'listar'>('crear');
 
   async ngOnInit(): Promise<void> {

@@ -26,7 +26,7 @@
   align-items: start;
 }
 
-/* Columna Poster */
+/* Columna del póster */
 .detalle-poster-col {
   display: flex;
   flex-direction: column;

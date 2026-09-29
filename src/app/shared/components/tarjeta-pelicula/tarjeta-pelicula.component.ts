@@ -12,7 +12,7 @@ import { ResumenResenias } from '../../../core/services/resenias.service';
   styleUrl: './tarjeta-pelicula.component.css',
 })
 
-// Por cada película en la lista, el template dibuja el componente reusable
+// La plantilla crea una tarjeta reutilizable por cada película de la lista.
 export class TarjetaPeliculaComponent {
   readonly pelicula = input.required<Pelicula>();
   readonly resumenResenias = input<ResumenResenias>({ promedio: 0, total: 0 });

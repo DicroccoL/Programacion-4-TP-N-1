@@ -1,10 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-/**
- * Simple tab navigation used inside the Admin Películas page.
- * Emits the selected tab identifier ("crear" | "listar").
- * Implements proper ARIA roles for accessibility.
- */
 @Component({
   selector: 'app-admin-peliculas-tabs',
   standalone: true,

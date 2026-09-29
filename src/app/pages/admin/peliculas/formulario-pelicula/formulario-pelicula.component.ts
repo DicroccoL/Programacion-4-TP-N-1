@@ -1,11 +1,12 @@
 import { Component, inject, EventEmitter, Output } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { PeliculasCrudService } from '../../../../core/services/peliculas-crud.service';
+import { SelectorFechaComponent } from '../../../../shared/components/selector-fecha/selector-fecha.component';
 
 @Component({
   selector: 'app-formulario-pelicula',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, SelectorFechaComponent],
   templateUrl: './formulario-pelicula.component.html',
   styleUrl: './formulario-pelicula.component.css',
 })

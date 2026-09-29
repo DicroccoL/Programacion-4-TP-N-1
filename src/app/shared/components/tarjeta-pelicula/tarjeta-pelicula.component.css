@@ -9,6 +9,7 @@
   color: inherit;
   transition: border-color 0.2s ease, transform 0.2s ease;
   height: 100%;
+  min-width: 0;
 }
 
 .card-pelicula:hover {
@@ -184,4 +185,28 @@
 .card-pelicula:hover .cta-arrow {
   transform: translateX(3px);
   color: var(--accent-crimson);
+}
+
+@media (max-width: 600px) {
+  .card-body {
+    padding: 0.75rem;
+  }
+
+  .card-meta {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    font-size: 0.62rem;
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+  }
+
+  .card-synopsis {
+    font-size: 0.74rem;
+  }
+
+  .card-cta {
+    font-size: 0.72rem;
+  }
 }

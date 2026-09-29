@@ -1,15 +1,16 @@
 import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
-import { DatePipe, DecimalPipe } from '@angular/common';
+import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ReseniasService } from '../../../core/services/resenias.service';
 import { Resenia } from '../../../models/pelicula.model';
+import { FechaArgentinaPipe } from '../../../shared/pipes/fecha-argentina.pipe';
 
 @Component({
   selector: 'app-resenias-pelicula',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule, RouterLink],
+  imports: [DecimalPipe, FechaArgentinaPipe, FormsModule, RouterLink],
   templateUrl: './resenias-pelicula.component.html',
   styleUrl: './resenias-pelicula.component.css',
 })

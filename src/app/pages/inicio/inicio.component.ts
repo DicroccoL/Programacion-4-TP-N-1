@@ -1,6 +1,6 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Pelicula } from '../../models/pelicula.model';
+import { GENEROS_PELICULA, Pelicula } from '../../models/pelicula.model';
 import { PeliculasService } from '../../core/services/peliculas.service';
 import { TarjetaPeliculaComponent } from '../../shared/components/tarjeta-pelicula/tarjeta-pelicula.component';
 import { ReseniasService, ResumenResenias } from '../../core/services/resenias.service';
@@ -23,17 +23,7 @@ export class InicioComponent implements OnInit {
   readonly cargando = signal(true);
   readonly error = signal('');
   readonly resumenVacio: ResumenResenias = { promedio: 0, total: 0 };
-  readonly generosDisponibles = computed(() => {
-    const generos = this.peliculas().flatMap((pelicula) =>
-      pelicula.generos?.length
-        ? pelicula.generos.map((genero) => genero.nombre)
-        : pelicula.genero.split(/[,/]/),
-    );
-
-    return [...new Set(generos.map((genero) => genero.trim()).filter(Boolean))].sort((a, b) =>
-      a.localeCompare(b, 'es'),
-    );
-  });
+  readonly generosDisponibles = GENEROS_PELICULA;
   readonly peliculasFiltradas = computed(() => {
     const termino = this.normalizar(this.busqueda());
     const genero = this.normalizar(this.generoSeleccionado());
@@ -50,7 +40,7 @@ export class InicioComponent implements OnInit {
   });
 
 
-  //llama en paralelo  a peliculas service y muestra las peliculas en cartelera y proximamente
+  // Consulta en paralelo el servicio de películas para cargar cartelera y próximos estrenos.
   async ngOnInit(): Promise<void> {
     try {
       const [cartelera, proximas] = await Promise.all([
@@ -58,7 +48,7 @@ export class InicioComponent implements OnInit {
         this.peliculasService.obtenerProximamente(),
       ]);
       
-//guarda los resultados en señales peliculas y proximamente 
+      // Guarda los resultados en las señales de cartelera y próximos estrenos.
       this.peliculas.set(cartelera);
       this.proximamente.set(proximas);
 

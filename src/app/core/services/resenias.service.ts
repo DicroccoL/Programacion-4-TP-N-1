@@ -7,10 +7,20 @@ export interface ResumenResenias {
   total: number;
 }
 
+/**
+ * Acceso a datos de reseñas en Supabase.
+ * Centraliza la lectura de opiniones, sus promedios y el guardado por película
+ * y usuario. Las funciones RPC utilizadas se crean con `supabase/sql/resenias.sql`.
+ */
 @Injectable({ providedIn: 'root' })
 export class ReseniasService {
   constructor(private readonly authService: AuthService) {}
 
+  /**
+   * Obtiene el promedio y la cantidad de reseñas para cada película solicitada.
+   * Devuelve un objeto indexado por ID para asociar cada resumen con su película.
+   * @throws El error devuelto por Supabase si falla la consulta RPC.
+   */
   async obtenerResumenes(peliculaIds: string[]): Promise<Record<string, ResumenResenias>> {
     if (peliculaIds.length === 0) return {};
 
@@ -30,25 +40,37 @@ export class ReseniasService {
     }]));
   }
 
+  /**
+   * Obtiene las reseñas de una película, con nombre público del autor,
+   * ordenadas por fecha descendente. Requiere la RPC
+   * `obtener_resenias_pelicula` definida en `supabase/sql/resenias.sql`.
+   * @throws El error devuelto por Supabase si falla la consulta RPC.
+   */
   async obtenerPorPelicula(peliculaId: string): Promise<Resenia[]> {
-    const { data, error } = await this.authService.client
-      .from('resenias')
-      .select('id, pelicula_id, usuario_id, puntaje, comentario, created_at')
-      .eq('pelicula_id', peliculaId)
-      .order('created_at', { ascending: false });
+    const { data, error } = await this.authService.client.rpc('obtener_resenias_pelicula', {
+      p_pelicula_id: peliculaId,
+    });
 
     if (error) throw error;
 
-    return (data ?? []).map((fila) => ({
+    const filas = (data ?? []) as Record<string, unknown>[];
+
+    return filas.map((fila) => ({
       id: String(fila['id']),
       peliculaId: String(fila['pelicula_id']),
       usuarioId: String(fila['usuario_id']),
+      nombreAutor: String(fila['nombre_autor'] ?? '').trim() || 'Usuario',
       puntaje: Number(fila['puntaje']),
       comentario: fila['comentario'] == null ? undefined : String(fila['comentario']),
       createdAt: fila['created_at'] == null ? undefined : String(fila['created_at']),
     }));
   }
 
+  /**
+   * Crea o actualiza la reseña de un usuario para una película.
+   * La combinación película-usuario debe ser única en Supabase; el comentario
+   * vacío se guarda como `null`.
+   */
   async guardar(
     peliculaId: string,
     usuarioId: string,
@@ -68,3 +90,4 @@ export class ReseniasService {
     if (error) throw error;
   }
 }
+// a futuro voy a agregar la opcion de siendo admin borrar reseñas de otros usuarios

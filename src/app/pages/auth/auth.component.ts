@@ -22,7 +22,7 @@ export class AuthComponent implements OnInit {
   successMessage: string | null = null;
 
   ngOnInit(): void {
-    // If a query param ?tab=register is present, switch to registration view
+    
     const tabParam = this.route.snapshot.queryParamMap.get('tab');
     if (tabParam === 'register') {
       this.tab = 'register';

@@ -1,23 +1,30 @@
 import { Component, input, output } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CredencialesRegistro, TipoSangre } from '../../../models/user.model';
+import { SelectorFechaComponent } from '../../../shared/components/selector-fecha/selector-fecha.component';
 
+/** Formulario de alta que valida los datos y los entrega al componente padre. */
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, SelectorFechaComponent],
   templateUrl: './registro.component.html',
   styleUrl: './registro.component.css',
 })
 export class RegistroComponent {
+  /** Deshabilita el formulario mientras se procesa el registro. */
   readonly isLoading = input<boolean>(false);
+
+  /** Emite los datos validados para que el componente contenedor registre la cuenta. */
   readonly registerSubmit = output<CredencialesRegistro>();
 
+  /** Opciones permitidas para los campos de sangre y color de ojos. */
   readonly tiposDeSangre: TipoSangre[] = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
   readonly coloresDeOjos = ['Marrón', 'Azul', 'Verde', 'Gris', 'Negro', 'Avellana'];
 
   readonly registerForm: FormGroup;
 
+  /** Construye el formulario reactivo y define las reglas de validación de cada campo. */
   constructor(private readonly fb: FormBuilder) {
     this.registerForm = this.fb.nonNullable.group({
       nombre: ['', [Validators.required, Validators.minLength(2)]],
@@ -31,6 +38,10 @@ export class RegistroComponent {
     });
   }
 
+  /**
+   * Si el formulario es inválido, marca sus controles para mostrar los errores.
+   * Si es válido, convierte los días de vacaciones a número y emite los datos al padre.
+   */
   onSubmit(): void {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();

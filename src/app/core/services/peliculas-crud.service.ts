@@ -1,5 +1,11 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { CrearPeliculaDTO, EstadoPelicula, Pelicula } from '../../models/pelicula.model';
+import {
+  CrearPeliculaDTO,
+  EstadoPelicula,
+  GeneroPelicula,
+  GENEROS_PELICULA,
+  Pelicula,
+} from '../../models/pelicula.model';
 import { PeliculasService } from './peliculas.service';
 
 /**
@@ -23,6 +29,7 @@ export class PeliculasCrudService {
   readonly peliculaEditandoId = signal<string | null>(null);
   readonly formulario = signal<CrearPeliculaDTO>(this.formularioVacio());
   readonly estados: EstadoPelicula[] = ['EN_CARTELERA', 'PROXIMAMENTE'];
+  readonly generos = GENEROS_PELICULA;
 
   // ─── Carga ──────────────────────────────────────────────────────────────────
   async cargarPeliculas(): Promise<void> {
@@ -88,7 +95,9 @@ export class PeliculasCrudService {
     this.peliculaEditandoId.set(pelicula.id);
     this.formulario.set({
       titulo:          pelicula.titulo,
-      genero:          pelicula.genero,
+      genero:          this.generos.includes(pelicula.genero as GeneroPelicula)
+        ? pelicula.genero
+        : '',
       sinopsis:        pelicula.sinopsis,
       duracionMin:     pelicula.duracionMin,
       imagenUrl:       pelicula.imagenUrl,
@@ -129,6 +138,9 @@ export class PeliculasCrudService {
     if (textosObligatorios.some((valor) => typeof valor !== 'string' || !valor.trim())) {
       return 'Completá el título, género, sinopsis y URL de imagen.';
     }
+    if (!this.generos.includes(formulario.genero as GeneroPelicula)) {
+      return 'Seleccioná uno de los géneros disponibles.';
+    }
 
     const duracion = Number(formulario.duracionMin);
     if (!Number.isInteger(duracion) || duracion < 1) {
@@ -150,13 +162,6 @@ export class PeliculasCrudService {
     if (!this.estados.includes(formulario.estado)) {
       return 'Seleccioná un estado válido para la película.';
     }
-    if (formulario.preventaActiva) {
-      const precio = Number(formulario.precioPreventa);
-      if (!Number.isFinite(precio) || precio <= 0) {
-        return 'Ingresá un precio de preventa mayor que cero.';
-      }
-    }
-
     return null;
   }
 

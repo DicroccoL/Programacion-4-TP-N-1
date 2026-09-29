@@ -6,7 +6,7 @@
   color: var(--text-primary);
 }
 
-/* Navbar */
+/* Barra de navegación */
 .app-navbar {
   background-color: var(--bg-canvas);
   border-bottom: 1px solid var(--border-subtle);
@@ -155,7 +155,7 @@
   flex: 1;
 }
 
-/* Footer Editorial */
+/* Pie de página editorial */
 .app-footer {
   background-color: var(--bg-surface);
   border-top: 1px solid var(--border-subtle);

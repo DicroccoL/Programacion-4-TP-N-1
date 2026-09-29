@@ -59,11 +59,10 @@
 
   <div class="form-group">
     <label for="register-fecha">Fecha de Nacimiento</label>
-    <input
+    <app-selector-fecha
       id="register-fecha"
-      type="date"
       formControlName="fechaNacimiento"
-      [disabled]="isLoading()"
+      [bloqueado]="isLoading()"
     />
     @if (registerForm.get('fechaNacimiento')?.invalid && registerForm.get('fechaNacimiento')?.touched) {
       <small>La fecha de nacimiento es obligatoria.</small>

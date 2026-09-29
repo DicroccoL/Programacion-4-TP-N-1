@@ -1,5 +1,18 @@
 export type ClasificacionEdad = 'ATP' | '+13' | '+18';
 export type EstadoPelicula = 'EN_CARTELERA' | 'PROXIMAMENTE';
+export const GENEROS_PELICULA = [
+  'Acción',
+  'Comedia',
+  'Drama',
+  'Ciencia Ficción',
+  'Terror',
+  'Aventura',
+  'Animación',
+  'Romance',
+  'Fantasía',
+  'Documental',
+] as const;
+export type GeneroPelicula = (typeof GENEROS_PELICULA)[number];
 
 export interface Genero {
   id: string;
@@ -32,6 +45,7 @@ export interface Resenia {
   id: string;
   peliculaId: string;
   usuarioId: string;
+  nombreAutor: string;
   puntaje: number;
   comentario?: string;
   createdAt?: string;

@@ -1,5 +1,5 @@
 <div class="inicio-page">
-  <!-- Hero Editorial Asimétrico -->
+  <!-- Encabezado editorial asimétrico -->
   <section class="hero-editorial">
     <div class="hero-main">
       <span class="hero-eyebrow">TEMPORADA 2026 — SALAS WILDE</span>
@@ -74,7 +74,7 @@
           (change)="generoSeleccionado.set($any($event.target).value)"
         >
           <option value="">Todos los géneros</option>
-          @for (genero of generosDisponibles(); track genero) {
+          @for (genero of generosDisponibles; track genero) {
             <option [value]="genero">{{ genero }}</option>
           }
         </select>
@@ -110,7 +110,7 @@
     }
   </section>
 
-  <!-- Sección 02: Próximamente y Preventas -->
+  <!-- Sección 03: Próximamente y preventas -->
   <section class="seccion-catalogo seccion-proximamente">
     <div class="seccion-header">
       <div class="header-titulos">

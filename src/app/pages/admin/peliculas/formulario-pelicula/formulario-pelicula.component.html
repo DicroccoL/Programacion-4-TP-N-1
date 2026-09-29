@@ -41,23 +41,23 @@
 
     <div class="campo">
       <label for="genero-pelicula">Género</label>
-      <input
+      <select
         #genero="ngModel"
         id="genero-pelicula"
         name="genero"
-        type="text"
-        maxlength="100"
-        placeholder="Terror, ciencia ficción"
-        [pattern]="patronTextoNoVacio"
         [(ngModel)]="crud.formulario().genero"
         required
         [attr.aria-invalid]="genero.invalid && (genero.touched || formulario.submitted)"
         aria-describedby="error-genero"
-      />
+      >
+        <option value="" disabled>Seleccioná un género</option>
+        @for (generoDisponible of crud.generos; track generoDisponible) {
+          <option [value]="generoDisponible">{{ generoDisponible }}</option>
+        }
+      </select>
       @if (genero.invalid && (genero.touched || formulario.submitted)) {
         <span id="error-genero" class="error-campo">
           @if (genero.errors?.['required']) { El género es obligatorio. }
-          @else if (genero.errors?.['pattern']) { Ingresá un género válido. }
         </span>
       }
     </div>
@@ -127,7 +127,7 @@
 
     <div class="campo">
       <label for="estreno-pelicula">Fecha de estreno</label>
-      <input id="estreno-pelicula" name="fechaEstreno" type="date" [(ngModel)]="crud.formulario().fechaEstreno" />
+      <app-selector-fecha id="estreno-pelicula" name="fechaEstreno" [(ngModel)]="crud.formulario().fechaEstreno" />
     </div>
 
     <div class="campo campo-amplio">
@@ -185,30 +185,6 @@
       />
       Preventa activa
     </label>
-
-    @if (crud.formulario().preventaActiva) {
-      <div class="campo">
-        <label for="precio-preventa-pelicula">Precio de preventa</label>
-        <input
-          #precioPreventa="ngModel"
-          id="precio-preventa-pelicula"
-          name="precioPreventa"
-          type="number"
-          min="0.01"
-          step="0.01"
-          [(ngModel)]="crud.formulario().precioPreventa"
-          required
-          [attr.aria-invalid]="precioPreventa.invalid && (precioPreventa.touched || formulario.submitted)"
-          aria-describedby="error-precio-preventa"
-        />
-        @if (precioPreventa.invalid && (precioPreventa.touched || formulario.submitted)) {
-          <span id="error-precio-preventa" class="error-campo">
-            @if (precioPreventa.errors?.['required']) { El precio de preventa es obligatorio. }
-            @else if (precioPreventa.errors?.['min']) { El precio debe ser mayor que cero. }
-          </span>
-        }
-      </div>
-    }
 
     <div class="acciones-form">
       <button type="submit" class="btn-principal" [disabled]="crud.guardando()">
