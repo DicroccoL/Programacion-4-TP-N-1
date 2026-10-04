@@ -10,6 +10,14 @@
       <button
         type="button"
         class="tab-btn"
+        [class.activo]="seccionActiva() === 'usuarios'"
+        (click)="cambiarSeccion('usuarios')"
+      >
+         Usuarios y roles
+      </button>
+      <button
+        type="button"
+        class="tab-btn"
         [class.activo]="seccionActiva() === 'peliculas'"
         (click)="cambiarSeccion('peliculas')"
       >
@@ -65,18 +73,10 @@
         <app-admin-peliculas />
       }
       @case ('salas') {
-        <div class="seccion-placeholder">
-          <h3>🏛️ Gestión de Salas y Butacas</h3>
-          <p>Configuración de las 20 filas (A-T) x 3 columnas, butacas VIP (R, S, T) y accesibles (filas centrales).</p>
-          <span class="badge-proximamente">Módulo en preparación</span>
-        </div>
+        <app-admin-salas />
       }
       @case ('funciones') {
-        <div class="seccion-placeholder">
-          <h3>🕒 Gestión de Funciones y Horarios</h3>
-          <p>Asignación de película a sala, formatos (2D/3D/4D/5D) y regla de 30 minutos entre funciones.</p>
-          <span class="badge-proximamente">Módulo en preparación</span>
-        </div>
+        <app-admin-funciones />
       }
       @case ('candybar') {
         <div class="seccion-placeholder">
@@ -86,18 +86,13 @@
         </div>
       }
       @case ('configuracion') {
-        <div class="seccion-placeholder">
-          <h3>⚙️ Configuración y Cupones</h3>
-          <p>Descuento configurable para la primera compra (20%), cupones para +50 años y puntos de fidelidad.</p>
-          <span class="badge-proximamente">Módulo en preparación</span>
-        </div>
+        <app-admin-configuracion />
+      }
+      @case ('usuarios') {
+        <app-admin-usuarios />
       }
       @case ('reportes') {
-        <div class="seccion-placeholder">
-          <h3>📊 Reportes y Auditoría</h3>
-          <p>Facturación diaria, películas más vistas, exportación a PDF/Excel y registro de actividades.</p>
-          <span class="badge-proximamente">Módulo en preparación</span>
-        </div>
+        <app-admin-reportes />
       }
     }
   </main>

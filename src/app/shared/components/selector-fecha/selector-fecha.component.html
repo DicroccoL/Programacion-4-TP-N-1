@@ -25,13 +25,9 @@
         </div>
 
         <div class="grupo-navegacion grupo-anio">
-          <button type="button" class="flecha" aria-label="Año anterior" (click)="navegarAnio(-1)">‹</button>
-          <select aria-label="Año" [value]="fechaVista.getFullYear()" (change)="cambiarAnio($any($event.target).value)">
-            @for (anio of anios; track anio) {
-              <option [value]="anio">{{ anio }}</option>
-            }
-          </select>
-          <button type="button" class="flecha" aria-label="Año siguiente" (click)="navegarAnio(1)">›</button>
+          <label class="etiqueta-anio" for="selector-anio-fecha">Año</label>
+          <input id="selector-anio-fecha" aria-label="Año" type="number" min="1900" [max]="anioActual"
+            [value]="fechaVista.getFullYear()" (change)="cambiarAnio($any($event.target).value)" />
         </div>
       </div>
 

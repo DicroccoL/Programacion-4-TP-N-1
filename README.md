@@ -11,6 +11,10 @@ La aplicación usa componentes standalone y navegación con Angular Router. `App
 | `/` | Inicio y cartelera | Público |
 | `/login` | Inicio de sesión y registro | Público |
 | `/pelicula/:id` | Detalle de película | Público |
+| `/funciones/:id/butacas` | Mapa y compra de butacas | Público, con reserva concurrente |
+| `/ticket/:id` | Ticket visual con QR y descarga PDF | Se accede al crear la orden |
+| `/mis-peliculas` | Historial y alertas personales | Usuario autenticado |
+| `/validar-qr` | Validación de entradas y Candy Bar | Empleado o administrador |
 | `/admin` | Panel de administración | Solo admin, mediante `adminGuard` |
 
 ### Capas principales
@@ -44,6 +48,11 @@ Para generar la compilación de producción: `npm run build`.
 
 
 - [Decisiones técnicas](DECISIONES_TECNICAS.md): motivos de las decisiones principales y límites actuales.
+- [Flujos de salas, funciones y butacas](FLUJOS_Y_DECISIONES_TECNICAS.md): configuración SQL, reglas de asignación y decisiones de reservas concurrentes.
+- [RPC administrativas de funciones](supabase/sql/funciones-admin.sql): SQL acotado para habilitar eliminación y actualización global de precios.
+- [Funciones de historial, puntos y reportes](supabase/sql/pendientes-consigna.sql): SQL idempotente para los flujos incorporados desde octubre de 2026.
+- [Comprobante de compra con QR](supabase/sql/comprobante-compra-qr.sql): RPC segura para devolver el comprobante de la orden al finalizar la selección de butacas. Debe ejecutarse en Supabase antes de usar el nuevo flujo.
+- [Edge Function para altas privilegiadas](supabase/functions/crear-usuario-privilegiado/index.ts): creación segura de usuarios empleado/admin desde el panel.
 - [Flujo de administración](src/app/pages/admin/README.md): detalle del CRUD de películas.
 
 ## Configuración de reseñas en Supabase

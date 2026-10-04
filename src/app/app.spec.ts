@@ -13,6 +13,7 @@ describe('App', () => {
           provide: AuthService,
           useValue: {
             isAdmin: () => false,
+            isEmpleado: () => false,
             isLoggedIn: () => false,
             currentProfile: () => null,
             logout: async () => undefined,

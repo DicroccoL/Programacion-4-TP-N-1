@@ -4,20 +4,29 @@ import { GENEROS_PELICULA, Pelicula } from '../../models/pelicula.model';
 import { PeliculasService } from '../../core/services/peliculas.service';
 import { TarjetaPeliculaComponent } from '../../shared/components/tarjeta-pelicula/tarjeta-pelicula.component';
 import { ReseniasService, ResumenResenias } from '../../core/services/resenias.service';
+import { AuthService } from '../../core/services/auth.service';
+import { ExperienciaClienteService, PeliculaVendida } from '../../core/services/experiencia-cliente.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
   imports: [TarjetaPeliculaComponent, RouterLink],
   templateUrl: './inicio.component.html',
-  styleUrl: './inicio.component.css',
+  styleUrls: ['./inicio.component.css', './inicio-extras.component.css'],
 })
 export class InicioComponent implements OnInit {
   private readonly peliculasService = inject(PeliculasService);
   private readonly reseniasService = inject(ReseniasService);
+  private readonly auth = inject(AuthService);
+  private readonly experiencia = inject(ExperienciaClienteService);
+  private readonly router = inject(Router);
   readonly peliculas = signal<Pelicula[]>([]);
   readonly proximamente = signal<Pelicula[]>([]);
   readonly resumenesResenias = signal<Record<string, ResumenResenias>>({});
+  readonly masVendidas = signal<PeliculaVendida[]>([]);
+  readonly alertasActivas = signal<Set<string>>(new Set());
+  readonly mensajeAlerta = signal('');
   readonly busqueda = signal('');
   readonly generoSeleccionado = signal('');
   readonly cargando = signal(true);
@@ -52,6 +61,13 @@ export class InicioComponent implements OnInit {
       this.peliculas.set(cartelera);
       this.proximamente.set(proximas);
 
+      try { this.masVendidas.set(await this.experiencia.obtenerMasVendidas()); } catch { /* El resto de la cartelera debe seguir visible. */ }
+      await this.auth.whenReady();
+      if (this.auth.currentUser()) {
+        try { this.alertasActivas.set(new Set((await this.experiencia.obtenerAlertasActivas()).map(a => a.peliculaId))); }
+        catch { /* La cartelera no depende de las alertas. */ }
+      }
+
       const ids = [...cartelera, ...proximas].map((pelicula) => pelicula.id);
       if (ids.length) {
         try {
@@ -64,6 +80,21 @@ export class InicioComponent implements OnInit {
       this.error.set('No se pudo cargar la cartelera.');
     } finally {
       this.cargando.set(false);
+    }
+  }
+
+  async activarAlerta(peliculaId: string): Promise<void> {
+    this.mensajeAlerta.set('');
+    if (!this.auth.currentUser()) {
+      await this.router.navigate(['/login'], { queryParams: { redirect: '/' } });
+      return;
+    }
+    try {
+      await this.experiencia.activarAlerta(peliculaId);
+      this.alertasActivas.update(current => new Set([...current, peliculaId]));
+      this.mensajeAlerta.set('Alerta activada. La vas a ver en Mis películas cuando haya funciones disponibles.');
+    } catch (error) {
+      this.mensajeAlerta.set(error instanceof Error ? error.message : 'No se pudo activar la alerta.');
     }
   }
 

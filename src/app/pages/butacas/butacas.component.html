@@ -1,0 +1,63 @@
+<main class="butacas-page">
+  <a routerLink="/" class="volver">← Volver a la cartelera</a>
+  @if (cargando()) { <p class="estado">Cargando sala…</p> }
+  @else if (error() && !funcion()) { <section class="estado error">{{ error() }}</section> }
+  @else if (funcion(); as f) {
+    <header class="encabezado">
+      <div><span class="eyebrow">SELECCIÓN DE BUTACAS</span><h1>{{ peliculaTitulo() || 'Tu próxima función' }}</h1>
+        <p>{{ f.fechaHoraInicio | fechaArgentina: true }} · Sala {{ f.sala?.numero }} · {{ f.formato }} · {{ f.idioma === 'CASTELLANO' ? 'Castellano' : 'Subtitulada' }}</p>
+      </div>
+      <a routerLink="/" class="cambiar">Cambiar película</a>
+    </header>
+    @if (preventaBloqueada()) {
+      <section class="mensaje-error" role="alert">Esta película está próxima a estrenarse y todavía no tiene la preventa activa. No se pueden elegir butacas ni comprar entradas.</section>
+    } @else {
+    <div class="layout-butacas">
+      <section class="mapa-seccion" aria-label="Mapa de butacas">
+        <div class="leyenda">
+          <span><i class="libre"></i> Libre</span><span><i class="ocupada"></i> Ocupada o retenida</span>
+          <span><i class="accesible"></i> Accesible</span><span><i class="vip"></i> VIP</span><span><i class="seleccionada"></i> Seleccionada</span><span><i class="retenida"></i> En selección</span>
+        </div>
+        <div class="pantalla">PANTALLA</div>
+        <div class="mapa-scroll"><div class="mapa">
+          @for (fila of filas(); track fila.letra) {
+            <div class="fila" [class.fila-accesible]="fila.letra === 'J'">
+              <span class="letra-fila">{{ fila.letra }}</span>
+              <div class="asientos">
+                @for (butaca of fila.seats; track butaca.id) {
+                  <button type="button" class="asiento" [style.grid-column]="butaca.numero" [class.asiento-vip]="butaca.tipo === 'VIP'" [class.asiento-accesible]="butaca.tipo === 'ACCESIBLE'" [class.asiento-seleccionado]="estaSeleccionada(butaca.id)" [class.asiento-ocupado]="butaca.ocupadaEnFuncion" [class.asiento-retenido]="estaReservada(butaca.id)" [disabled]="butaca.ocupadaEnFuncion || estaReservada(butaca.id)" [attr.aria-label]="'Fila ' + butaca.fila + ', butaca ' + butaca.numero + ', ' + butaca.tipo" [title]="butaca.fila + butaca.numero + ' · ' + precio(butaca) + (butaca.tipo === 'VIP' ? ' · VIP' : '')" (click)="alternar(butaca)"></button>
+                }
+              </div>
+            </div>
+          }
+        </div></div>
+        <p class="nota-mapa">Las butacas seleccionadas se reservan durante 5 minutos mientras completás la compra. Una vez creada la orden, quedan ocupadas. La disponibilidad se actualiza en tiempo real.</p>
+      </section>
+      <aside class="resumen">
+        <h2>Resumen</h2>
+        @if (!seleccionadas().length) { <p class="resumen-vacio">Elegí hasta 8 butacas libres para continuar.</p> }
+        @else {
+          <ul>@for (butaca of seleccionadas(); track butaca.id) {<li><span>{{ butaca.fila }}{{ butaca.numero }}<small>{{ butaca.tipo === 'VIP' ? ' · VIP' : butaca.tipo === 'ACCESIBLE' ? ' · Accesible' : '' }}</small></span><strong>{{ precio(butaca) | monedaArgentina }}</strong><button type="button" aria-label="Quitar butaca" (click)="alternar(butaca)">×</button></li>}</ul>
+          <div class="subtotal"><span>Subtotal</span><strong>{{ subtotal() | monedaArgentina }}</strong></div>
+          <div class="total"><span>Total</span><strong>{{ subtotal() | monedaArgentina }}</strong></div>
+          @if (edadMinima()) {
+            <div class="control-edad"><strong>Clasificación {{ f.pelicula?.clasificacion }}</strong>
+              @if (!usuarioAutenticado()) {
+                <p>Esta película tiene clasificación {{ f.pelicula?.clasificacion }}. Revisá la restricción de edad antes de continuar con la compra.</p>
+                <label><input type="checkbox" [checked]="avisoEdadLeido()" (change)="avisoEdadLeido.set($any($event.target).checked)"> Leí el aviso de clasificación y confirmo que las personas asistentes cumplen con la restricción.</label>
+              } @else {
+                @if (edadActual() === null) {<label>Fecha de nacimiento<input type="date" [value]="fechaNacimientoAnonima()" (input)="fechaNacimientoAnonima.set($any($event.target).value)"></label>}
+                @if (edadActual() !== null && edadActual()! < edadMinima()) {<p>Las personas menores de {{ edadMinima() }} años deben concurrir acompañadas por una persona adulta responsable.</p><label><input type="checkbox" [checked]="asisteAdulto()" (change)="asisteAdulto.set($any($event.target).checked)"> Confirmo que asistirá con una persona adulta.</label>}
+              }
+            </div>
+          }
+          <button class="comprar" type="button" [disabled]="comprando() || compraBloqueadaEdad()" (click)="comprar()">{{ comprando() ? 'Procesando…' : 'Comprar' }}</button>
+          <small class="nota-pago">Al tocar Comprar se genera la orden y se abre tu ticket con QR válido. No se procesa un pago online.</small>
+        }
+        @if (error() && funcion()) {<p class="mensaje-error" role="alert">{{ error() }}</p>}
+        @if (mensaje()) {<p class="mensaje-ok" role="status">{{ mensaje() }}</p>}
+      </aside>
+    </div>
+    }
+  }
+</main>

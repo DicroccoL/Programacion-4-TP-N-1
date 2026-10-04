@@ -7,7 +7,7 @@
         La experiencia de la gran pantalla, <span class="title-italic">redefinida</span>.
       </h1>
       <p class="hero-lead">
-        Proyecciones en formatos 2D, 3D y 4D con sonido inmersivo y salas con distribución de 20 filas, butacas VIP en últimas filas y sector exclusivo accesible.
+        Proyecciones en formatos 2D y 3D con sonido inmersivo y salas con distribución de 20 filas, butacas VIP en últimas filas y sector exclusivo accesible.
       </p>
 
       <div class="hero-actions">
@@ -29,7 +29,6 @@
     
   </section>
 
-  <!-- Espacio preparado para el ranking de películas más vendidas -->
   <section class="seccion-catalogo">
     <div class="seccion-header">
       <div class="header-titulos">
@@ -38,9 +37,16 @@
       </div>
       <p class="seccion-bajada">Las favoritas del público.</p>
     </div>
-    <div class="estado-caja">
-      <p>El ranking estará disponible cuando se registren las primeras ventas.</p>
-    </div>
+    @if (masVendidas().length) {
+      <div class="grid-peliculas">
+        @for (pelicula of masVendidas(); track pelicula.id) {
+          <a class="ranking-card" [routerLink]="['/pelicula', pelicula.id]">
+            <img [src]="pelicula.imagenUrl || 'logo.png'" [alt]="'Póster de ' + pelicula.titulo">
+            <span><strong>{{ pelicula.titulo }}</strong><small>{{ pelicula.totalVendidas }} entradas vendidas</small></span>
+          </a>
+        }
+      </div>
+    } @else { <div class="estado-caja"><p>Aún no hay ventas confirmadas para armar el ranking.</p></div> }
   </section>
 
   <!-- Sección 02: Cartelera -->
@@ -133,12 +139,15 @@
     } @else {
       <div class="grid-peliculas">
         @for (pelicula of proximamente(); track pelicula.id) {
-          <app-tarjeta-pelicula
-            [pelicula]="pelicula"
-            [resumenResenias]="resumenesResenias()[pelicula.id] ?? resumenVacio"
-          />
+          <div class="proxima-con-alerta">
+            <app-tarjeta-pelicula [pelicula]="pelicula" [resumenResenias]="resumenesResenias()[pelicula.id] ?? resumenVacio" />
+            <button type="button" [disabled]="alertasActivas().has(pelicula.id)" (click)="activarAlerta(pelicula.id)">
+              {{ alertasActivas().has(pelicula.id) ? 'Alerta activada ✓' : 'Avisarme del estreno' }}
+            </button>
+          </div>
         }
       </div>
     }
+    @if (mensajeAlerta()) { <p class="mensaje-alerta" role="status">{{ mensajeAlerta() }}</p> }
   </section>
 </div>

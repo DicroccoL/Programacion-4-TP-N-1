@@ -15,6 +15,12 @@
         <a *soloAdmin routerLink="/admin" routerLinkActive="active" class="nav-link-admin">
           Panel de Control
         </a>
+        @if (authService.isLoggedIn()) {
+          <a routerLink="/mis-peliculas" routerLinkActive="active">Mis películas</a>
+        }
+        @if (authService.isEmpleado() || authService.isAdmin()) {
+          <a routerLink="/validar-qr" routerLinkActive="active">Validar QR</a>
+        }
       </nav>
 
       <div class="nav-auth">
@@ -49,7 +55,7 @@
       <div class="footer-col brand-col">
         <span class="footer-brand">WILDECINEMAS</span>
         <p class="footer-desc">
-          Proyecciones en 2D, 3D y 4D. Salas equipadas con sonido inmersivo y filas exclusivas VIP y accesibles.
+          Proyecciones en 2D y 3D. Salas equipadas con sonido inmersivo y filas exclusivas VIP y accesibles.
         </p>
       </div>
 

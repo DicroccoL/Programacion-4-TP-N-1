@@ -1,0 +1,47 @@
+.funciones-opciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 1.25rem 0;
+}
+
+.funcion-opcion {
+  min-width: 76px;
+  display: grid;
+  justify-items: center;
+  gap: 0.1rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-canvas);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.funcion-opcion:hover {
+  border-color: var(--accent-crimson);
+  color: var(--text-primary);
+}
+
+.funcion-opcion.funcion-seleccionada {
+  border-color: var(--accent-crimson);
+  background: var(--accent-crimson-subtle);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 1px var(--accent-crimson);
+}
+
+.funcion-dia {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.funcion-opcion strong {
+  font-size: 1.2rem;
+  line-height: 1.25;
+}
+
+.funcion-hora {
+  font-size: 0.75rem;
+}

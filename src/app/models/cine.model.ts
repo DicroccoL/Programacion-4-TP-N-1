@@ -1,12 +1,14 @@
 import { Pelicula } from './pelicula.model';
 
 export type TipoButaca = 'NORMAL' | 'ACCESIBLE' | 'VIP';
-export type FormatoProyeccion = '2D' | '3D' | '4D' | '5D';
+export type FormatoProyeccion = '2D' | '3D';
 export type IdiomaFuncion = 'CASTELLANO' | 'SUBTITULADA';
 
 export interface Sala {
   id: string;
   numero: number;
+  formatos?: FormatoProyeccion[];
+  idiomas?: IdiomaFuncion[];
 }
 
 export interface Butaca {

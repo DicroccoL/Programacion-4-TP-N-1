@@ -62,24 +62,38 @@
           <p class="synopsis-text">{{ p.sinopsis }}</p>
         </section>
 
-        <!-- Bloque de Compra / Funciones -->
+        <!-- Selección de una función antes de habilitar la compra de butacas -->
         <section class="info-buy-card">
           <div class="buy-header">
             <div>
-              <h3 class="buy-title">Selección de Butacas</h3>
-              <p class="buy-subtitle">Accedé al mapa en vivo de la sala para elegir butacas normales, VIP o accesibles.</p>
+              <h3 class="buy-title">Funciones</h3>
+              <p class="buy-subtitle">Seleccioná una función para continuar.</p>
             </div>
             @if (p.preventaActiva) {
               <span class="badge-preventa-chip">PREVENTA ACTIVA</span>
             }
           </div>
 
-          <div class="buy-actions">
-            <button type="button" class="btn-comprar">
-              Elegir Función y Butacas →
-            </button>
-            <span class="buy-hint">Compra anónima o con cuenta con 20% OFF</span>
-          </div>
+          @if (!puedeComprar()) {
+            <p class="buy-hint">Esta película está próxima a estrenarse. Las entradas estarán disponibles únicamente cuando se active la preventa.</p>
+          }
+          @else if (errorFunciones()) { <p class="buy-hint">{{ errorFunciones() }}</p> }
+          @else if (funciones().length) {
+            <div class="funciones-opciones" role="group" aria-label="Funciones disponibles">
+              @for (funcion of funciones(); track funcion.id) {
+                <button type="button" class="funcion-opcion" [class.funcion-seleccionada]="funcionSeleccionada() === funcion.id" [attr.aria-pressed]="funcionSeleccionada() === funcion.id" [attr.aria-label]="'Seleccionar función del ' + diaSemanaFuncion(funcion) + ' ' + diaNumeroFuncion(funcion) + ' a las ' + horaFuncion(funcion)" (click)="funcionSeleccionada.set(funcion.id)">
+                  <span class="funcion-dia">{{ diaSemanaFuncion(funcion) }}</span>
+                  <strong>{{ diaNumeroFuncion(funcion) }}</strong>
+                  <span class="funcion-hora">{{ horaFuncion(funcion) }} h</span>
+                </button>
+              }
+            </div>
+            <div class="buy-actions">
+              <button type="button" class="btn-comprar" [disabled]="!funcionSeleccionada()" (click)="irAButacas()">Elegir butacas →</button>
+            </div>
+          } @else {
+            <p class="buy-hint">Todavía no hay funciones disponibles para esta película.</p>
+          }
         </section>
 
         <app-resenias-pelicula [peliculaId]="p.id" />

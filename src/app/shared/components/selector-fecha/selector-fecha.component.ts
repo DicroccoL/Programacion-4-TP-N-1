@@ -26,7 +26,7 @@ export class SelectorFechaComponent implements ControlValueAccessor {
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
   ];
   readonly diasSemana = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
-  readonly anios = Array.from({ length: 121 }, (_, indice) => new Date().getFullYear() - 100 + indice);
+  readonly anioActual = new Date().getFullYear();
 
   valor = '';
   fechaVista = new Date();
@@ -90,7 +90,10 @@ export class SelectorFechaComponent implements ControlValueAccessor {
   }
 
   cambiarAnio(anio: string): void {
-    this.fechaVista = new Date(Number(anio), this.fechaVista.getMonth(), 1);
+    const valor = Number(anio);
+    if (!Number.isInteger(valor)) return;
+    const limitado = Math.min(this.anioActual, Math.max(1900, valor));
+    this.fechaVista = new Date(limitado, this.fechaVista.getMonth(), 1);
   }
 
   seleccionarDia(dia: DiaCalendario): void {

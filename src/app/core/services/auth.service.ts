@@ -87,6 +87,12 @@ export class AuthService {
     await this.authReady;
   }
 
+  /** Recarga el perfil después de operaciones que modifican saldo o puntos. */
+  async refreshCurrentProfile(): Promise<void> {
+    const user = this.currentUser();
+    if (user) await this.loadUserProfile(user);
+  }
+
   /**
    * Cliente de Supabase disponible para otras capas que necesiten acceso directo.
    */
@@ -198,7 +204,7 @@ export class AuthService {
   }
 
   /**
-   * Registrar nuevo usuario y crear fila en 'perfiles'
+   * Registrar cliente; el trigger de Supabase crea su fila en 'perfiles'.
    */
   async register(credentials: CredencialesRegistro): Promise<{ success: boolean; error?: string }> {
     this.isLoading.set(true);
@@ -220,32 +226,14 @@ export class AuthService {
       });
 
       if (error) {
-        return { success: false, error: error.message };
+        return { success: false, error: this.mensajeErrorRegistro(error) };
       }
 
-      if (data.user) {
+      // El trigger seguro de auth.users crea el perfil dentro de la transacción
+      // del registro. Evitamos el upsert desde el navegador: con confirmación de
+      // correo todavía no hay sesión y RLS debe impedir esa escritura anónima.
+      if (data.user && data.session) {
         this.currentUser.set(data.user);
-
-
-        const { error: profileError } = await this.supabase.from('perfiles').upsert({
-          id: data.user.id,
-          email: credentials.email.trim(),
-          nombre: credentials.nombre.trim(),
-          apellido: credentials.apellido.trim(),
-          fecha_nacimiento: credentials.fechaNacimiento,
-          tipo_sangre: credentials.tipoSangre,
-          color_ojos: credentials.colorOjos.trim(),
-          dias_vacaciones_anio: credentials.diasVacacionesAnio,
-          rol: 'cliente',
-          saldo_credito: 0,
-          puntos_fidelidad: 0,
-          primera_compra_usada: false,
-        });
-
-        if (profileError) {
-          console.warn('Advertencia al insertar en tabla perfiles:', profileError);
-        }
-
         await this.loadUserProfile(data.user);
       }
 
@@ -256,6 +244,17 @@ export class AuthService {
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  private mensajeErrorRegistro(error: { message?: string; code?: string }): string {
+    const message = error.message ?? 'No se pudo crear la cuenta.';
+    if (/database error saving new user/i.test(message)) {
+      return 'Supabase no pudo crear el perfil asociado a la cuenta. Ejecutá supabase/sql/registro-usuarios.sql en el SQL Editor y revisá los logs de Auth si el problema continúa.';
+    }
+    if (error.code === '23505' || /already registered|already exists/i.test(message)) {
+      return 'Ya existe una cuenta registrada con ese correo. Iniciá sesión o usá otro correo.';
+    }
+    return message;
   }
 
   /**
