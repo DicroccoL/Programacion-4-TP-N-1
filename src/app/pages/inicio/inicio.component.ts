@@ -1,4 +1,4 @@
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { GENEROS_PELICULA, Pelicula } from '../../models/pelicula.model';
 import { PeliculasService } from '../../core/services/peliculas.service';
@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
   templateUrl: './inicio.component.html',
   styleUrls: ['./inicio.component.css', './inicio-extras.component.css'],
 })
-export class InicioComponent implements OnInit {
+export class InicioComponent implements OnInit, OnDestroy {
   private readonly peliculasService = inject(PeliculasService);
   private readonly reseniasService = inject(ReseniasService);
   private readonly auth = inject(AuthService);
@@ -25,6 +25,8 @@ export class InicioComponent implements OnInit {
   readonly proximamente = signal<Pelicula[]>([]);
   readonly resumenesResenias = signal<Record<string, ResumenResenias>>({});
   readonly masVendidas = signal<PeliculaVendida[]>([]);
+  readonly indiceRanking = signal(0);
+  readonly peliculaRankingActual = computed(() => this.masVendidas()[this.indiceRanking()] ?? null);
   readonly alertasActivas = signal<Set<string>>(new Set());
   readonly mensajeAlerta = signal('');
   readonly busqueda = signal('');
@@ -33,6 +35,8 @@ export class InicioComponent implements OnInit {
   readonly error = signal('');
   readonly resumenVacio: ResumenResenias = { promedio: 0, total: 0 };
   readonly generosDisponibles = GENEROS_PELICULA;
+  private intervaloRanking?: ReturnType<typeof setInterval>;
+  private destruido = false;
   readonly peliculasFiltradas = computed(() => {
     const termino = this.normalizar(this.busqueda());
     const genero = this.normalizar(this.generoSeleccionado());
@@ -61,7 +65,12 @@ export class InicioComponent implements OnInit {
       this.peliculas.set(cartelera);
       this.proximamente.set(proximas);
 
-      try { this.masVendidas.set(await this.experiencia.obtenerMasVendidas()); } catch { /* El resto de la cartelera debe seguir visible. */ }
+      try {
+        this.masVendidas.set(await this.experiencia.obtenerMasVendidas());
+        if (this.masVendidas().length > 1 && !this.destruido) {
+          this.intervaloRanking = setInterval(() => this.cambiarRanking(1), 5000);
+        }
+      } catch { /* El resto de la cartelera debe seguir visible. */ }
       await this.auth.whenReady();
       if (this.auth.currentUser()) {
         try { this.alertasActivas.set(new Set((await this.experiencia.obtenerAlertasActivas()).map(a => a.peliculaId))); }
@@ -83,6 +92,11 @@ export class InicioComponent implements OnInit {
     }
   }
 
+  ngOnDestroy(): void {
+    this.destruido = true;
+    if (this.intervaloRanking) clearInterval(this.intervaloRanking);
+  }
+
   async activarAlerta(peliculaId: string): Promise<void> {
     this.mensajeAlerta.set('');
     if (!this.auth.currentUser()) {
@@ -96,6 +110,11 @@ export class InicioComponent implements OnInit {
     } catch (error) {
       this.mensajeAlerta.set(error instanceof Error ? error.message : 'No se pudo activar la alerta.');
     }
+  }
+
+  cambiarRanking(sentido: number): void {
+    const total = this.masVendidas().length;
+    if (total) this.indiceRanking.update(indice => (indice + sentido + total) % total);
   }
 
   private normalizar(valor: string): string {
