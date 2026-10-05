@@ -28,6 +28,7 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
   `,
   styleUrls: ['./admin-peliculas-tabs.component.css']
 })
+/** Mantiene la pestaña activa del módulo administrativo de películas. */
 export class AdminPeliculasTabsComponent {
   @Input() active: 'crear' | 'listar' = 'crear';
   @Output() change = new EventEmitter<'crear' | 'listar'>();

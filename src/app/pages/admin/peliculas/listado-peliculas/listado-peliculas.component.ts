@@ -8,6 +8,7 @@ import { PeliculasCrudService } from '../../../../core/services/peliculas-crud.s
   templateUrl: './listado-peliculas.component.html',
   styleUrl: './listado-peliculas.component.css',
 })
+/** Presenta las películas existentes y emite acciones de edición o baja. */
 export class ListadoPeliculasComponent {
   readonly crud = inject(PeliculasCrudService);
 

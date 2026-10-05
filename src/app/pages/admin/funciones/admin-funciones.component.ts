@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PeliculasService } from '../../../core/services/peliculas.service';
-import { ProgramacionService } from '../../../core/services/programacion.service';
+import { SalasFuncionesService } from '../../../core/services/salas-funciones.service';
 import { Pelicula } from '../../../models/pelicula.model';
 import { FormatoProyeccion, Funcion, IdiomaFuncion } from '../../../models/cine.model';
 import { FechaArgentinaPipe } from '../../../shared/pipes/fecha-argentina.pipe';
@@ -31,8 +31,9 @@ import { MonedaArgentinaPipe } from '../../../shared/pipes/moneda-argentina.pipe
     .programacion-admin{display:grid;gap:1.25rem;color:var(--text-primary)}.programacion-admin p,.vacio{color:var(--text-muted);margin-top:.25rem}.form-programacion{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:1rem;align-items:end;padding:1.25rem;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md)}.form-programacion label{display:grid;gap:.4rem;color:var(--text-secondary);font-size:.85rem}.form-programacion input,.form-programacion select{width:100%;padding:.7rem;background:var(--bg-input);border:1px solid var(--border-strong);border-radius:var(--radius-sm)}.accion-principal{padding:.75rem 1rem;border:0;border-radius:var(--radius-sm);background:var(--accent-crimson);font-weight:700;cursor:pointer}.accion-principal:disabled{opacity:.6}.lista-funciones{display:grid;gap:.65rem}.lista-funciones article{display:flex;gap:1rem;flex-wrap:wrap;align-items:center;padding:.9rem 1rem;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm)}.lista-funciones span{color:var(--text-secondary)}.btn-eliminar{margin-left:auto;padding:.5rem .75rem;border:1px solid #fb7185;border-radius:var(--radius-sm);background:transparent;color:#fda4af;cursor:pointer}.btn-eliminar:disabled{opacity:.6}.aviso{padding:.75rem 1rem;border-radius:var(--radius-sm)}.exito{color:#6ee7b7;background:#064e3b55}.error{color:#fda4af;background:#88133755}
   `],
 })
+/** Crea, lista y elimina funciones futuras; la sala compatible la asigna Supabase. */
 export class AdminFuncionesComponent implements OnInit {
-  private readonly peliculasService = inject(PeliculasService); private readonly programacion = inject(ProgramacionService);
+  private readonly peliculasService = inject(PeliculasService); private readonly programacion = inject(SalasFuncionesService);
   readonly peliculas = signal<Pelicula[]>([]); readonly funciones = signal<Funcion[]>([]);
   readonly formatos: FormatoProyeccion[] = ['2D','3D'];
   readonly guardando = signal(false); readonly error = signal(''); readonly mensaje = signal('');

@@ -4,7 +4,7 @@ import { Pelicula } from '../../models/pelicula.model';
 import { PeliculasService } from '../../core/services/peliculas.service';
 import { FechaArgentinaPipe } from '../../shared/pipes/fecha-argentina.pipe';
 import { ReseniasPeliculaComponent } from './resenias/resenias-pelicula.component';
-import { ProgramacionService } from '../../core/services/programacion.service';
+import { SalasFuncionesService } from '../../core/services/salas-funciones.service';
 import { Funcion } from '../../models/cine.model';
 
 @Component({
@@ -17,7 +17,7 @@ import { Funcion } from '../../models/cine.model';
 export class DetallePeliculaComponent implements OnInit {
   private readonly ruta = inject(ActivatedRoute);
   private readonly peliculasService = inject(PeliculasService);
-  private readonly programacionService = inject(ProgramacionService);
+  private readonly programacionService = inject(SalasFuncionesService);
   private readonly router = inject(Router);
 
   readonly pelicula = signal<Pelicula | null>(null);

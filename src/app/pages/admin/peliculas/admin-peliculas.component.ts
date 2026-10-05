@@ -11,6 +11,7 @@ import { AdminPeliculasTabsComponent } from './admin-peliculas-tabs/admin-pelicu
   templateUrl: './admin-peliculas.component.html',
   styleUrl: './admin-peliculas.component.css',
 })
+/** Coordina las vistas de listado y formulario del CRUD de películas. */
 export class AdminPeliculasComponent implements OnInit {
   private readonly crud = inject(PeliculasCrudService);
 

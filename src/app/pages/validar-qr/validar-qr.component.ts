@@ -24,6 +24,11 @@ type QrDetectorConstructor = new (options: { formats: string[] }) => QrDetector;
     .validar{max-width:700px;margin:3rem auto;padding:2rem;color:var(--text-primary);background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-lg)}.validar>span{font-size:.75rem;letter-spacing:.15em;color:var(--accent-crimson)}.validar>p{color:var(--text-secondary)}form{display:grid;gap:1rem;margin-top:1.5rem}label{display:grid;gap:.4rem;color:var(--text-secondary)}input,select{padding:.8rem;background:var(--bg-input);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary)}button{justify-self:start;padding:.8rem 1rem;border:0;border-radius:var(--radius-sm);background:var(--accent-crimson);color:white;font-weight:700;cursor:pointer}video{display:block;width:min(100%,560px);margin-top:1rem;border-radius:var(--radius-md)}video[hidden]{display:none}.ok{color:#6ee7b7}.error{color:#fda4af}
   `],
 })
+/**
+ * Valida entradas o productos de Candy Bar para personal autorizado.
+ * La cámara sólo captura el texto; la validación y el uso único del código
+ * se resuelven en Supabase mediante la RPC `validar_qr_orden`.
+ */
 export class ValidarQrComponent implements OnDestroy {
   private readonly auth = inject(AuthService);
   codigo = '';
@@ -38,6 +43,7 @@ export class ValidarQrComponent implements OnDestroy {
 
   ngOnDestroy(): void { this.detenerEscaner(); }
 
+  /** Abre la cámara y busca códigos QR cada medio segundo. */
   async iniciarEscaner(): Promise<void> {
     this.error.set('');
     const Constructor = (window as unknown as { BarcodeDetector?: QrDetectorConstructor }).BarcodeDetector;
@@ -60,6 +66,7 @@ export class ValidarQrComponent implements OnDestroy {
     } catch (e) { this.detenerEscaner(); this.error.set(e instanceof Error ? e.message : 'No se pudo acceder a la cámara. Ingresá el código manualmente.'); }
   }
 
+  /** Detiene el intervalo de lectura y libera la cámara. */
   detenerEscaner(): void {
     if (this.scanTimer) clearInterval(this.scanTimer);
     this.scanTimer = undefined;
@@ -68,6 +75,7 @@ export class ValidarQrComponent implements OnDestroy {
     this.escaneando.set(false);
   }
 
+  /** Envía el código y el tipo de producto al servidor para validarlo. */
   async validar(): Promise<void> {
     this.validando.set(true); this.mensaje.set(''); this.error.set('');
     try {

@@ -10,6 +10,7 @@ import { SelectorFechaComponent } from '../../../../shared/components/selector-f
   templateUrl: './formulario-pelicula.component.html',
   styleUrl: './formulario-pelicula.component.css',
 })
+/** Formulario reutilizable para crear o editar una película. */
 export class FormularioPeliculaComponent {
   readonly crud = inject(PeliculasCrudService);
   readonly patronTextoNoVacio = '.*\\S.*';

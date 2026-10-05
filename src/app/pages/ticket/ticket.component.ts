@@ -42,6 +42,11 @@ import { MonedaArgentinaPipe } from '../../shared/pipes/moneda-argentina.pipe';
   `,
   styleUrl: './ticket.component.css',
 })
+/**
+ * Muestra el comprobante recibido luego de confirmar una compra.
+ * Supabase genera el identificador `codigo_qr`; este componente lo convierte
+ * en imagen y arma el PDF localmente con jsPDF.
+ */
 export class TicketComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   readonly ticket = signal<ComprobanteCompra | null>(null);
@@ -49,6 +54,7 @@ export class TicketComponent implements OnInit {
   readonly cargando = signal(true);
   readonly error = signal('');
 
+  /** Recupera el comprobante desde la navegación o sessionStorage y genera el QR visual. */
   async ngOnInit(): Promise<void> {
     const id = this.route.snapshot.paramMap.get('id');
     const state = (history.state ?? {}) as { comprobante?: ComprobanteCompra };
@@ -78,6 +84,7 @@ export class TicketComponent implements OnInit {
     return new Intl.DateTimeFormat('es-AR', { dateStyle: 'full', timeStyle: 'short', timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date(value));
   }
 
+  /** Crea y descarga un PDF A5 con los datos de la orden y el QR. */
   descargarPdf(): void {
     const t = this.ticket();
     const qr = this.qr();

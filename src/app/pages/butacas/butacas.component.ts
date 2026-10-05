@@ -3,7 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { AuthService } from '../../core/services/auth.service';
-import { ProgramacionService } from '../../core/services/programacion.service';
+import { SalasFuncionesService } from '../../core/services/salas-funciones.service';
 import { ButacasService } from '../../core/services/butacas.service';
 import { ComprasService } from '../../core/services/compras.service';
 import { Butaca, Funcion } from '../../models/cine.model';
@@ -19,7 +19,7 @@ import { SelectorFechaComponent } from '../../shared/components/selector-fecha/s
 export class ButacasComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
-  private readonly programacion = inject(ProgramacionService);
+  private readonly programacion = inject(SalasFuncionesService);
   private readonly butacasService = inject(ButacasService);
   private readonly comprasService = inject(ComprasService);
   private readonly auth = inject(AuthService);

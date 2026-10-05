@@ -14,6 +14,7 @@ import { FechaArgentinaPipe } from '../../../shared/pipes/fecha-argentina.pipe';
   templateUrl: './resenias-pelicula.component.html',
   styleUrl: './resenias-pelicula.component.css',
 })
+/** Lista reseñas y permite al usuario autenticado crear o editar la propia. */
 export class ReseniasPeliculaComponent implements OnInit {
   readonly peliculaId = input.required<string>();
   readonly estrellas = [1, 2, 3, 4, 5];
@@ -50,11 +51,13 @@ export class ReseniasPeliculaComponent implements OnInit {
     }
   }
 
+  /** Guarda una puntuación de una a cinco estrellas en el formulario. */
   seleccionarPuntaje(puntaje: number): void {
     this.puntaje.set(puntaje);
     this.error.set('');
   }
 
+  /** Guarda mediante upsert y recarga la lista para reflejar el promedio. */
   async guardar(): Promise<void> {
     const usuarioId = this.authService.currentUser()?.id;
     if (!usuarioId) return;
@@ -83,6 +86,7 @@ export class ReseniasPeliculaComponent implements OnInit {
     }
   }
 
+  /** Copia al formulario la reseña existente del usuario actual. */
   private cargarReseniaPropia(): void {
     const propia = this.reseniaPropia();
     if (propia) {

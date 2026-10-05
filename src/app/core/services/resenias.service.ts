@@ -69,6 +69,7 @@ export class ReseniasService {
    * La combinación película-usuario debe ser única en Supabase; el comentario
    * vacío se guarda como `null`.
    */
+  /** Inserta o actualiza una reseña por película y usuario. */
   async guardar(
     peliculaId: string,
     usuarioId: string,

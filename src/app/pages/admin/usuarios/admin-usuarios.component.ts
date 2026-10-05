@@ -29,6 +29,7 @@ import { SelectorFechaComponent } from '../../../shared/components/selector-fech
     .usuarios-admin{display:grid;gap:1rem;color:var(--text-primary);max-width:850px}.usuarios-admin header p,.nota{color:var(--text-muted)}.form-usuario{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;padding:1.25rem;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md)}.form-usuario label{display:grid;gap:.4rem;color:var(--text-secondary);font-size:.85rem}.form-usuario input,.form-usuario select{padding:.7rem;background:var(--bg-input);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-primary)}.form-usuario button{justify-self:start;align-self:end;padding:.75rem 1rem;border:0;border-radius:var(--radius-sm);background:var(--accent-crimson);font-weight:700;color:white;cursor:pointer}.form-usuario button:disabled{opacity:.6}.nota,.estado{font-size:.85rem}.ok{color:#6ee7b7}.error{color:#fda4af}
   `],
 })
+/** Solicita la creación de empleados o administradores mediante Edge Function. */
 export class AdminUsuariosComponent {
   private readonly auth = inject(AuthService);
   nombre=''; apellido=''; email=''; password=''; fechaNacimiento=''; tipoSangre=''; colorOjos=''; diasVacaciones=0;

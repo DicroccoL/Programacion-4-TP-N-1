@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormatoProyeccion, IdiomaFuncion, Sala } from '../../../models/cine.model';
-import { ProgramacionService } from '../../../core/services/programacion.service';
+import { SalasFuncionesService } from '../../../core/services/salas-funciones.service';
 
 @Component({
   selector: 'app-admin-salas', standalone: true, imports: [FormsModule],
@@ -42,8 +42,9 @@ import { ProgramacionService } from '../../../core/services/programacion.service
     .form-programacion>label{display:grid;gap:.4rem;color:var(--text-secondary);font-size:.85rem}.form-programacion input[type=number]{width:100%;padding:.7rem;background:var(--bg-input);border:1px solid var(--border-strong);border-radius:var(--radius-sm)}fieldset{border:1px solid var(--border-subtle);border-radius:var(--radius-sm);display:flex;gap:.8rem;flex-wrap:wrap;min-height:72px}legend{font-size:.8rem;color:var(--text-secondary)}.opcion{display:flex;align-items:center;gap:.35rem;font-size:.85rem}.accion-principal{padding:.75rem 1rem;border:0;border-radius:var(--radius-sm);background:var(--accent-crimson);font-weight:700;cursor:pointer}.accion-principal:disabled,.accion-eliminar:disabled{opacity:.6;cursor:wait}.lista-salas{display:grid;gap:.65rem}.lista-salas article{display:flex;align-items:center;gap:1rem;flex-wrap:wrap;padding:.9rem 1rem;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-sm)}.lista-salas article span{color:var(--text-secondary)}.accion-eliminar{margin-left:auto;padding:.55rem .8rem;border:1px solid #fda4af66;border-radius:var(--radius-sm);background:#88133755;color:#fda4af;font-weight:600;cursor:pointer}.accion-eliminar:hover:not(:disabled){background:#881337aa}.aviso{padding:.75rem 1rem;border-radius:var(--radius-sm)}.exito{color:#6ee7b7;background:#064e3b55}.error{color:#fda4af;background:#88133755}
   `],
 })
+/** Gestiona salas y sus butacas, incluyendo creación y eliminación segura. */
 export class AdminSalasComponent implements OnInit {
-  private readonly programacion = inject(ProgramacionService);
+  private readonly programacion = inject(SalasFuncionesService);
   readonly formatos: FormatoProyeccion[] = ['2D','3D'];
   readonly idiomas: IdiomaFuncion[] = ['CASTELLANO','SUBTITULADA'];
   readonly formatoElegido = signal<FormatoProyeccion>('2D');

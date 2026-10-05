@@ -23,6 +23,7 @@ export type SeccionAdmin =
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css',
 })
+/** Contenedor del panel admin y selector de sus módulos funcionales. */
 export class AdminComponent {
   readonly authService = inject(AuthService);
   // Señal que guarda qué pestaña está abierta (por defecto 'peliculas')

@@ -30,7 +30,7 @@ export interface CrearFuncionDTO {
  * salas, funciones y configuración.
  */
 @Injectable({ providedIn: 'root' })
-export class ProgramacionService {
+export class SalasFuncionesService {
   constructor(private readonly auth: AuthService) {}
 
   /** Lista las salas ordenadas por número y adapta sus datos al modelo Sala. */

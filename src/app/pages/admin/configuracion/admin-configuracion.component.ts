@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ProgramacionService } from '../../../core/services/programacion.service';
+import { SalasFuncionesService } from '../../../core/services/salas-funciones.service';
 
 @Component({
   selector: 'app-admin-configuracion', standalone: true, imports: [FormsModule],
@@ -26,8 +26,9 @@ import { ProgramacionService } from '../../../core/services/programacion.service
     .configuracion-admin{display:grid;gap:1.25rem;color:var(--text-primary);max-width:680px}.configuracion-admin header p{color:var(--text-muted);margin-top:.25rem}.precio-form{display:grid;gap:.75rem;padding:1.25rem;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md)}.precio-form>label{font-size:.9rem;font-weight:600}.precio-control{display:flex;align-items:center;gap:.5rem;padding:.65rem .8rem;background:var(--bg-input);border:1px solid var(--border-strong);border-radius:var(--radius-sm);color:var(--text-secondary)}.precio-control input{width:100%;border:0;background:transparent;color:var(--text-primary);outline:0}.ayuda{font-size:.82rem;color:var(--text-muted)}.precio-form button,.recargar{justify-self:start;padding:.75rem 1rem;border:0;border-radius:var(--radius-sm);background:var(--accent-crimson);font-weight:700;cursor:pointer;color:var(--text-primary)}.precio-form button:disabled,.recargar:disabled{opacity:.6}.aviso{padding:.75rem 1rem;border-radius:var(--radius-sm)}.exito{color:#6ee7b7;background:#064e3b55}.error{color:#fda4af;background:#88133755}
   `],
 })
+/** Administra la configuración global, principalmente el precio base. */
 export class AdminConfiguracionComponent implements OnInit {
-  private readonly programacion = inject(ProgramacionService);
+  private readonly programacion = inject(SalasFuncionesService);
   readonly guardando = signal(false); readonly cargando = signal(true);
   readonly configuracionCargada = signal(false); readonly error = signal(''); readonly mensaje = signal('');
   precio = 0;

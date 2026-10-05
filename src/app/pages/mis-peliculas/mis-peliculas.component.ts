@@ -33,6 +33,10 @@ import { ExperienciaClienteService, MiAlertaEstreno, MiPelicula } from '../../co
     .mis-peliculas{max-width:1200px;margin:auto;padding:2rem clamp(1rem,4vw,3rem);color:var(--text-primary);min-height:55vh}.volver{color:var(--text-secondary)}header{margin:2rem 0}header>span{color:var(--accent-crimson);font-size:.75rem;letter-spacing:.16em;font-weight:700}header h1{font-size:clamp(2rem,4vw,3rem);margin:.4rem 0}header p,.estado{color:var(--text-secondary)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem}.grid article{display:grid;grid-template-columns:110px 1fr;gap:1rem;padding:1rem;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md)}img{width:110px;aspect-ratio:2/3;object-fit:cover;border-radius:var(--radius-sm)}h2{font-size:1.1rem;margin:.2rem 0 .7rem}.grid p{font-size:.87rem;color:var(--text-secondary);margin:.35rem 0}.grid a,.vacio a{color:var(--accent-crimson)}.grid button{padding:.55rem .7rem;border:1px solid #fb7185;border-radius:var(--radius-sm);background:transparent;color:#fda4af;cursor:pointer}.vacio{padding:2rem;border:1px solid var(--border-subtle);border-radius:var(--radius-md);background:var(--bg-surface)}.error{color:#fda4af}.alertas{margin-bottom:1.5rem;padding:1rem;background:var(--bg-surface);border:1px solid var(--border-subtle);border-radius:var(--radius-md)}.alertas article{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:.65rem 0;border-top:1px solid var(--border-subtle)}.alertas article span{color:var(--text-secondary)}code{font-size:.78rem;word-break:break-all;color:var(--text-primary)}
   `],
 })
+/**
+ * Historial privado del cliente autenticado: entradas, alertas, puntos,
+ * crédito y cancelaciones. Las reglas definitivas se controlan en Supabase.
+ */
 export class MisPeliculasComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly experiencia = inject(ExperienciaClienteService);
@@ -57,7 +61,12 @@ export class MisPeliculasComponent implements OnInit {
   fecha(value: string): string { return new Intl.DateTimeFormat('es-AR',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Argentina/Buenos_Aires'}).format(new Date(value)); }
   moneda(value:number):string{return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(value);}
   idioma(value:string):string{return value==='SUBTITULADA'?'Subtitulada':'Castellano';}
+
+  /** Control visual: sólo muestra cancelar si faltan más de dos horas. */
   puedeCancelar(value:string):boolean{return new Date(value).getTime()>Date.now()+2*60*60*1000;}
+
+  
+  /** Solicita la cancelación y actualiza el crédito e historial del usuario. */
   async cancelar(ordenId:string):Promise<void>{
     if(!confirm('La orden se cancelará y el total se acreditará como crédito en tu cuenta. ¿Continuar?'))return;
     this.cancelando.set(ordenId);this.error.set('');this.mensaje.set('');
