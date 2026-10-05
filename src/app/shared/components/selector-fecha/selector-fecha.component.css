@@ -1,158 +1,28 @@
-:host {
-  display: block;
-  width: 100%;
-}
-
-.selector-fecha {
-  position: relative;
-  width: 100%;
-}
-
-.campo-fecha {
-  display: flex;
-  width: 100%;
-  min-height: 42px;
+:host { display: block; width: 100%; }
+.fecha-control {
+  box-sizing: border-box;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding: 0.7rem 0.85rem;
+  gap: .2rem;
+  min-height: 42px;
+  padding: .35rem .65rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--radius-sm);
   background: var(--bg-input);
   color: var(--text-primary);
-  text-align: left;
   font: inherit;
-  cursor: pointer;
 }
-
-.campo-fecha:disabled { cursor: not-allowed; opacity: 0.55; }
-.icono-calendario { color: var(--text-muted); font-size: 1.1rem; }
-
-.calendario {
-  position: absolute;
-  z-index: 20;
-  top: calc(100% + 0.45rem);
-  left: 0;
-  width: min(21rem, calc(100vw - 2.5rem));
-  padding: 1rem;
-  border: 1px solid var(--border-subtle);
-  border-radius: 0.85rem;
-  background: var(--bg-surface);
-  color: var(--text-primary);
-  box-shadow: 0 16px 40px rgb(0 0 0 / 35%);
-}
-
-.navegacion,
-.grupo-navegacion,
-.acciones-calendario {
-  display: flex;
-  align-items: center;
-}
-
-.navegacion { justify-content: space-between; gap: 0.5rem; margin-bottom: 0.9rem; }
-.grupo-navegacion { min-width: 0; gap: 0.2rem; }
-.grupo-anio { margin-left: auto; flex-shrink: 0; gap: 0.3rem; }
-
-.grupo-navegacion select {
-  min-width: 0;
-  max-width: 7.5rem;
-  padding: 0.4rem 0.25rem;
+.fecha-control:focus-within { outline: 2px solid color-mix(in srgb, var(--accent-crimson) 55%, transparent); outline-offset: 1px; }
+.fecha-control input {
+  width: 2.1rem;
+  padding: .25rem 0;
   border: 0;
-  border-radius: 0.4rem;
+  outline: 0;
   background: transparent;
   color: var(--text-primary);
   font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.etiqueta-anio { color: var(--text-muted); font-size: .72rem; font-weight: 600; }
-.grupo-anio input {
-  width: 5.8rem;
-  min-width: 0;
-  padding: .4rem .25rem;
-  border: 1px solid var(--border-subtle);
-  border-radius: .4rem;
-  background: var(--bg-input);
-  color: var(--text-primary);
-  font: inherit;
-  font-weight: 600;
-}
-.grupo-navegacion option { background: var(--bg-surface); color: var(--text-primary); }
-
-.flecha {
-  width: 2rem;
-  height: 2rem;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.flecha:hover,
-.dia:hover { background: color-mix(in srgb, var(--accent-crimson) 18%, transparent); }
-
-.matriz-calendario {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  gap: 0.2rem;
   text-align: center;
 }
-
-.encabezado-dia {
-  padding: 0.35rem 0;
-  color: var(--text-muted);
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.dia {
-  display: grid;
-  place-items: center;
-  aspect-ratio: 1;
-  width: 100%;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--text-primary);
-  font: inherit;
-  font-size: 0.84rem;
-  cursor: pointer;
-}
-
-.dia.otro-mes { color: var(--text-muted); opacity: 0.55; }
-.dia.seleccionado { background: var(--accent-crimson); color: #fff; font-weight: 700; }
-
-.acciones-calendario {
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 0.9rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--border-subtle);
-}
-
-.accion {
-  padding: 0.5rem 0.75rem;
-  border: 0;
-  border-radius: 0.45rem;
-  background: transparent;
-  color: var(--text-secondary);
-  font: inherit;
-  font-size: 0.84rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.accion.aceptar { background: var(--accent-crimson); color: #fff; }
-.accion:disabled { cursor: not-allowed; opacity: 0.45; }
-
-@media (max-width: 420px) {
-  .calendario { width: min(20rem, calc(100vw - 2.5rem)); }
-  .navegacion { gap: 0.2rem; }
-  .grupo-navegacion { gap: 0; }
-  .grupo-navegacion select { max-width: 6.5rem; }
-  .grupo-anio input { width: 5.4rem; }
-}
+.fecha-control input.anio { width: 3.5rem; }
+.fecha-control input::placeholder { color: var(--text-muted); opacity: 1; }
+.fecha-control.deshabilitado { opacity: .55; }

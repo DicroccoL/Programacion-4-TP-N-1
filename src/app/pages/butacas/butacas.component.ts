@@ -1,21 +1,27 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RealtimeChannel } from '@supabase/supabase-js';
 import { AuthService } from '../../core/services/auth.service';
 import { ProgramacionService } from '../../core/services/programacion.service';
+import { ButacasService } from '../../core/services/butacas.service';
+import { ComprasService } from '../../core/services/compras.service';
 import { Butaca, Funcion } from '../../models/cine.model';
 import { FechaArgentinaPipe } from '../../shared/pipes/fecha-argentina.pipe';
 import { MonedaArgentinaPipe } from '../../shared/pipes/moneda-argentina.pipe';
+import { SelectorFechaComponent } from '../../shared/components/selector-fecha/selector-fecha.component';
 
 @Component({
   selector: 'app-butacas', standalone: true,
-  imports: [MonedaArgentinaPipe, FechaArgentinaPipe, RouterLink],
+  imports: [MonedaArgentinaPipe, FechaArgentinaPipe, RouterLink, FormsModule, SelectorFechaComponent],
   templateUrl: './butacas.component.html', styleUrl: './butacas.component.css',
 })
 export class ButacasComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly programacion = inject(ProgramacionService);
+  private readonly butacasService = inject(ButacasService);
+  private readonly comprasService = inject(ComprasService);
   private readonly auth = inject(AuthService);
   readonly funcion = signal<Funcion | null>(null);
   readonly peliculaTitulo = signal('');
@@ -68,14 +74,14 @@ export class ButacasComponent implements OnInit, OnDestroy {
     try {
       await this.auth.whenReady();
       const [funciones, butacas] = await Promise.all([
-        this.programacion.listarFunciones(), this.programacion.obtenerButacas(this.funcionId),
+        this.programacion.listarFunciones(), this.butacasService.obtenerButacas(this.funcionId),
       ]);
       this.funcion.set(funciones.find(f => f.id === this.funcionId) ?? null);
       this.peliculaTitulo.set(this.funcion()?.pelicula?.titulo ?? '');
       this.butacas.set(butacas);
       if (!this.funcion()) throw new Error('La función ya no está disponible.');
       await this.actualizarReservas();
-      this.canal = this.programacion.canalReservas(this.funcionId, () => void this.actualizarReservas());
+      this.canal = this.butacasService.canalReservas(this.funcionId, () => void this.actualizarReservas());
       this.sincronizador = setInterval(() => void this.actualizarReservas(), 15000);
     } catch (e) { this.error.set(e instanceof Error ? e.message : 'No se pudo cargar el mapa de butacas.'); }
     finally { this.cargando.set(false); }
@@ -84,7 +90,7 @@ export class ButacasComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.canal) void this.auth.client.removeChannel(this.canal);
     if (this.sincronizador) clearInterval(this.sincronizador);
-    if (this.seleccionadas().length) void this.programacion.liberarReservas(this.token, this.seleccionadas().map(b => b.id));
+    if (this.seleccionadas().length) void this.butacasService.liberarReservas(this.token, this.seleccionadas().map(b => b.id));
   }
 
   precio(butaca: Butaca): number {
@@ -100,13 +106,13 @@ export class ButacasComponent implements OnInit, OnDestroy {
     const current = this.seleccionadas();
     if (this.estaSeleccionada(butaca.id)) {
       this.seleccionadas.set(current.filter(b => b.id !== butaca.id));
-      try { await this.programacion.liberarReservas(this.token, [butaca.id]); }
+      try { await this.butacasService.liberarReservas(this.token, [butaca.id]); }
       catch { this.error.set('No se pudo liberar la reserva de la butaca.'); }
       return;
     }
     if (current.length >= 8) { this.error.set('Podés seleccionar hasta 8 butacas por compra.'); return; }
     try {
-      await this.programacion.reservarButaca(this.funcionId, butaca.id, this.token);
+      await this.butacasService.reservarButaca(this.funcionId, butaca.id, this.token);
       this.seleccionadas.set([...current, butaca]);
       await this.actualizarReservas();
     } catch (e) {
@@ -120,7 +126,7 @@ export class ButacasComponent implements OnInit, OnDestroy {
     if (!this.seleccionadas().length) return;
     this.comprando.set(true); this.error.set(''); this.mensaje.set('');
     try {
-      const comprobante = await this.programacion.crearOrden(this.funcionId,
+      const comprobante = await this.comprasService.crearOrden(this.funcionId,
         this.seleccionadas().map(b => b.id), this.token, this.usuarioAutenticado() ? (this.fechaNacimiento() || null) : null,
         this.usuarioAutenticado() ? this.asisteAdulto() : this.avisoEdadLeido());
       try { sessionStorage.setItem(`ticket:${comprobante.ordenId}`, JSON.stringify(comprobante)); } catch { /* La navegación conserva el ticket en history.state. */ }
@@ -152,8 +158,8 @@ export class ButacasComponent implements OnInit, OnDestroy {
   private async actualizarReservas(): Promise<void> {
     try {
       const [active, disponibles] = await Promise.all([
-        this.programacion.obtenerReservasActivas(this.funcionId),
-        this.programacion.obtenerButacas(this.funcionId),
+        this.butacasService.obtenerReservasActivas(this.funcionId),
+        this.butacasService.obtenerButacas(this.funcionId),
       ]);
       const own = new Set(this.seleccionadas().map(b => b.id));
       // Una reserva propia se representa en turquesa y se puede quitar desde el resumen.

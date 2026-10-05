@@ -46,7 +46,7 @@
                 <p>Esta película tiene clasificación {{ f.pelicula?.clasificacion }}. Revisá la restricción de edad antes de continuar con la compra.</p>
                 <label><input type="checkbox" [checked]="avisoEdadLeido()" (change)="avisoEdadLeido.set($any($event.target).checked)"> Leí el aviso de clasificación y confirmo que las personas asistentes cumplen con la restricción.</label>
               } @else {
-                @if (edadActual() === null) {<label>Fecha de nacimiento<input type="date" [value]="fechaNacimientoAnonima()" (input)="fechaNacimientoAnonima.set($any($event.target).value)"></label>}
+                @if (edadActual() === null) {<label>Fecha de nacimiento<app-selector-fecha [(ngModel)]="fechaNacimientoAnonima" /></label>}
                 @if (edadActual() !== null && edadActual()! < edadMinima()) {<p>Las personas menores de {{ edadMinima() }} años deben concurrir acompañadas por una persona adulta responsable.</p><label><input type="checkbox" [checked]="asisteAdulto()" (change)="asisteAdulto.set($any($event.target).checked)"> Confirmo que asistirá con una persona adulta.</label>}
               }
             </div>

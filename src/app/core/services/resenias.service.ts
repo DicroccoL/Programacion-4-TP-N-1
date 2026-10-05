@@ -10,7 +10,6 @@ export interface ResumenResenias {
 /**
  * Acceso a datos de reseñas en Supabase.
  * Centraliza la lectura de opiniones, sus promedios y el guardado por película
- * y usuario. Las funciones RPC utilizadas se crean con `supabase/sql/resenias.sql`.
  */
 @Injectable({ providedIn: 'root' })
 export class ReseniasService {
@@ -43,7 +42,6 @@ export class ReseniasService {
   /**
    * Obtiene las reseñas de una película, con nombre público del autor,
    * ordenadas por fecha descendente. Requiere la RPC
-   * `obtener_resenias_pelicula` definida en `supabase/sql/resenias.sql`.
    * @throws El error devuelto por Supabase si falla la consulta RPC.
    */
   async obtenerPorPelicula(peliculaId: string): Promise<Resenia[]> {

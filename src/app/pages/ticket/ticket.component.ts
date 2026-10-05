@@ -2,7 +2,7 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
-import { ComprobanteCompra } from '../../core/services/programacion.service';
+import { ComprobanteCompra } from '../../core/services/compras.service';
 import { MonedaArgentinaPipe } from '../../shared/pipes/moneda-argentina.pipe';
 
 @Component({

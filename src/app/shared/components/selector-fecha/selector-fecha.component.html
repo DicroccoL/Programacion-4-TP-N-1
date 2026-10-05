@@ -1,57 +1,10 @@
-<div class="selector-fecha">
-  <button
-    [id]="id || null"
-    class="campo-fecha"
-    type="button"
-    [disabled]="deshabilitado || bloqueado"
-    [attr.aria-expanded]="abierto"
-    (click)="abierto ? cancelar() : abrir()"
-  >
-    <span>{{ valorVisible || 'Seleccioná una fecha' }}</span>
-    <span class="icono-calendario" aria-hidden="true">▦</span>
-  </button>
-
-  @if (abierto) {
-    <section class="calendario" aria-label="Selector de fecha">
-      <div class="navegacion">
-        <div class="grupo-navegacion">
-          <button type="button" class="flecha" aria-label="Mes anterior" (click)="navegarMes(-1)">‹</button>
-          <select aria-label="Mes" [value]="fechaVista.getMonth()" (change)="cambiarMes($any($event.target).value)">
-            @for (mes of meses; track mes; let indice = $index) {
-              <option [value]="indice">{{ mes }}</option>
-            }
-          </select>
-          <button type="button" class="flecha" aria-label="Mes siguiente" (click)="navegarMes(1)">›</button>
-        </div>
-
-        <div class="grupo-navegacion grupo-anio">
-          <label class="etiqueta-anio" for="selector-anio-fecha">Año</label>
-          <input id="selector-anio-fecha" aria-label="Año" type="number" min="1900" [max]="anioActual"
-            [value]="fechaVista.getFullYear()" (change)="cambiarAnio($any($event.target).value)" />
-        </div>
-      </div>
-
-      <div class="matriz-calendario" role="grid" aria-label="Días del mes">
-        @for (diaSemana of diasSemana; track $index) {
-          <span class="encabezado-dia" role="columnheader">{{ diaSemana }}</span>
-        }
-        @for (dia of dias; track dia.fecha) {
-          <button
-            type="button"
-            role="gridcell"
-            class="dia"
-            [class.otro-mes]="!dia.perteneceAlMes"
-            [class.seleccionado]="estaSeleccionado(dia.fecha)"
-            [attr.aria-pressed]="estaSeleccionado(dia.fecha)"
-            (click)="seleccionarDia(dia)"
-          >{{ dia.numero }}</button>
-        }
-      </div>
-
-      <div class="acciones-calendario">
-        <button type="button" class="accion cancelar" (click)="cancelar()">Cancelar</button>
-        <button type="button" class="accion aceptar" [disabled]="!fechaTemporal" (click)="confirmar()">Aceptar</button>
-      </div>
-    </section>
-  }
+<div class="fecha-control" [class.deshabilitado]="deshabilitado || bloqueado" role="group" aria-label="Fecha">
+  <input type="text" inputmode="numeric" maxlength="2" placeholder="00" aria-label="Día" [value]="dia"
+    [disabled]="deshabilitado || bloqueado" (input)="escribir('dia', $event)" (focus)="$any($event.target).select()" (blur)="tocar()">
+  <span aria-hidden="true">/</span>
+  <input type="text" inputmode="numeric" maxlength="2" placeholder="00" aria-label="Mes" [value]="mes"
+    [disabled]="deshabilitado || bloqueado" (input)="escribir('mes', $event)" (focus)="$any($event.target).select()" (blur)="tocar()">
+  <span aria-hidden="true">/</span>
+  <input class="anio" type="text" inputmode="numeric" maxlength="4" placeholder="2000" aria-label="Año" [value]="anio"
+    [disabled]="deshabilitado || bloqueado" (input)="escribir('anio', $event)" (focus)="$any($event.target).select()" (blur)="tocar()">
 </div>

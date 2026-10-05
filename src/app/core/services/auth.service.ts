@@ -25,8 +25,14 @@ import {
  * - cualquier pantalla que necesite saber si el usuario está autenticado
  */
 export class AuthService {
+  /** Duración máxima de una sesión de navegador: 7 minutos. */
+  private static readonly DURACION_MAXIMA_SESION_MS = 7 * 60 * 1000;
+  private static readonly CLAVE_INICIO_SESION = 'wildecinemas.session.startedAt';
+
   private supabase: SupabaseClient;
   private readonly authReady: Promise<void>;
+  private temporizadorSesion?: ReturnType<typeof setTimeout>;
+  private cerrandoPorVencimiento = false;
 
   // Estado reactivo con Signals
   /**
@@ -77,6 +83,12 @@ export class AuthService {
     );
 
     this.authReady = this.initAuth();
+
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) void this.verificarVencimientoSesion();
+      });
+    }
   }
 
   /**
@@ -85,6 +97,7 @@ export class AuthService {
    */
   async whenReady(): Promise<void> {
     await this.authReady;
+    await this.verificarVencimientoSesion();
   }
 
   /** Recarga el perfil después de operaciones que modifican saldo o puntos. */
@@ -107,20 +120,43 @@ export class AuthService {
     try {
       const { data: { session } } = await this.supabase.auth.getSession();
       if (session?.user) {
-        this.currentUser.set(session.user);
-        await this.loadUserProfile(session.user);
+        const inicio = this.leerInicioSesion(session.user.id);
+        if (inicio === null || this.sesionVencida(inicio)) {
+          // Las sesiones existentes sin marca se cierran una vez para que
+          // desde este despliegue todas tengan un inicio de duración conocido.
+          await this.cerrarSesionLocal();
+        } else {
+          this.currentUser.set(session.user);
+          this.programarVencimiento(inicio);
+          await this.loadUserProfile(session.user);
+        }
+      } else {
+        this.limpiarInicioSesion();
       }
     } catch (error) {
       console.error('Error al inicializar sesión:', error);
     }
 
-    this.supabase.auth.onAuthStateChange(async (_event, session) => {
+    this.supabase.auth.onAuthStateChange(async (event, session) => {
       const user = session?.user ?? null;
       this.currentUser.set(user);
 
       if (user) {
+        let inicio = this.leerInicioSesion(user.id);
+        if (event === 'SIGNED_IN' && inicio === null) {
+          inicio = Date.now();
+          this.guardarInicioSesion(user.id, inicio);
+        }
+        if (inicio === null || this.sesionVencida(inicio)) {
+          // Diferimos el signOut para no ejecutar una operación Auth dentro
+          // del callback que procesa el propio cambio de estado.
+          setTimeout(() => void this.cerrarSesionLocal(), 0);
+          return;
+        }
+        this.programarVencimiento(inicio);
         await this.loadUserProfile(user);
       } else {
+        this.limpiarInicioSesion();
         this.currentProfile.set(null);
       }
     });
@@ -190,6 +226,7 @@ export class AuthService {
       }
 
       if (data.user) {
+        this.iniciarSesionLocal(data.user.id);
         this.currentUser.set(data.user);
         await this.loadUserProfile(data.user);
       }
@@ -233,6 +270,7 @@ export class AuthService {
       // del registro. Evitamos el upsert desde el navegador: con confirmación de
       // correo todavía no hay sesión y RLS debe impedir esa escritura anónima.
       if (data.user && data.session) {
+        this.iniciarSesionLocal(data.user.id);
         this.currentUser.set(data.user);
         await this.loadUserProfile(data.user);
       }
@@ -269,12 +307,99 @@ export class AuthService {
       }
       this.currentUser.set(null);
       this.currentProfile.set(null);
+      this.limpiarInicioSesion();
       return { success: true };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error al cerrar sesión';
       return { success: false, error: message };
     } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  /** Guarda el comienzo de una sesión nueva y programa su cierre local. */
+  private iniciarSesionLocal(userId: string): void {
+    const inicioExistente = this.leerInicioSesion(userId);
+    const inicio = inicioExistente ?? Date.now();
+    this.guardarInicioSesion(userId, inicio);
+    this.programarVencimiento(inicio);
+  }
+
+  private guardarInicioSesion(userId: string, inicio: number): void {
+    try {
+      localStorage.setItem(
+        AuthService.CLAVE_INICIO_SESION,
+        JSON.stringify({ userId, inicio }),
+      );
+    } catch (error) {
+      console.warn('No se pudo guardar el inicio de la sesión:', error);
+    }
+  }
+
+  private leerInicioSesion(userId: string): number | null {
+    try {
+      const raw = localStorage.getItem(AuthService.CLAVE_INICIO_SESION);
+      if (!raw) return null;
+      const dato = JSON.parse(raw) as { userId?: unknown; inicio?: unknown };
+      if (dato.userId !== userId || typeof dato.inicio !== 'number' || !Number.isFinite(dato.inicio)) {
+        return null;
+      }
+      return dato.inicio;
+    } catch {
+      return null;
+    }
+  }
+
+  private sesionVencida(inicio: number): boolean {
+    return Date.now() - inicio >= AuthService.DURACION_MAXIMA_SESION_MS;
+  }
+
+  private programarVencimiento(inicio: number): void {
+    if (this.temporizadorSesion) clearTimeout(this.temporizadorSesion);
+    const tiempoRestante = Math.max(
+      0,
+      inicio + AuthService.DURACION_MAXIMA_SESION_MS - Date.now(),
+    );
+    this.temporizadorSesion = setTimeout(
+      () => void this.verificarVencimientoSesion(),
+      tiempoRestante,
+    );
+  }
+
+  private async verificarVencimientoSesion(): Promise<void> {
+    const user = this.currentUser();
+    if (!user || this.cerrandoPorVencimiento) return;
+    const inicio = this.leerInicioSesion(user.id);
+    if (inicio === null || this.sesionVencida(inicio)) {
+      await this.cerrarSesionLocal();
+    } else {
+      this.programarVencimiento(inicio);
+    }
+  }
+
+  private async cerrarSesionLocal(): Promise<void> {
+    if (this.cerrandoPorVencimiento) return;
+    this.cerrandoPorVencimiento = true;
+    if (this.temporizadorSesion) clearTimeout(this.temporizadorSesion);
+    this.temporizadorSesion = undefined;
+    try {
+      const { error } = await this.supabase.auth.signOut({ scope: 'local' });
+      if (error) console.error('No se pudo cerrar la sesión vencida:', error);
+    } finally {
+      this.limpiarInicioSesion();
+      this.currentUser.set(null);
+      this.currentProfile.set(null);
+      this.cerrandoPorVencimiento = false;
+    }
+  }
+
+  private limpiarInicioSesion(): void {
+    if (this.temporizadorSesion) clearTimeout(this.temporizadorSesion);
+    this.temporizadorSesion = undefined;
+    try {
+      localStorage.removeItem(AuthService.CLAVE_INICIO_SESION);
+    } catch (error) {
+      console.warn('No se pudo limpiar el inicio de la sesión:', error);
     }
   }
 }

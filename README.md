@@ -1,60 +1,69 @@
 # WildeCinemas
 
-Aplicación web de cine desarrollada con Angular y Supabase. Este README describe cómo está organizada la aplicación actualmente.
+Aplicación web para consultar la cartelera y comprar entradas de cine. Está desarrollada con Angular y utiliza Supabase para autenticación y persistencia.
 
-## Arquitectura
+## Funcionalidades
 
-La aplicación usa componentes standalone y navegación con Angular Router. `AppLayoutComponent` contiene la estructura común (navegación y `router-outlet`); el router carga la página correspondiente a cada URL.
+- Cartelera con búsqueda por título y filtro por género, detalle de películas, reseñas y próximos estrenos con alertas.
+- Selección de butacas con reservas temporales sincronizadas entre usuarios y compra de entradas.
+- Ticket con código QR y descarga en PDF.
+- Historial personal de películas, entradas y alertas para usuarios registrados.
+- Validación de códigos QR para entradas y Candy Bar, disponible para empleados y administradores.
+- Panel administrativo para gestionar películas, funciones, salas, usuarios, configuración y reportes.
 
-| Ruta | Página | Acceso |
+## Tecnologías
 
-| `/` | Inicio y cartelera | Público |
-| `/login` | Inicio de sesión y registro | Público |
-| `/pelicula/:id` | Detalle de película | Público |
-| `/funciones/:id/butacas` | Mapa y compra de butacas | Público, con reserva concurrente |
-| `/ticket/:id` | Ticket visual con QR y descarga PDF | Se accede al crear la orden |
-| `/mis-peliculas` | Historial y alertas personales | Usuario autenticado |
-| `/validar-qr` | Validación de entradas y Candy Bar | Empleado o administrador |
-| `/admin` | Panel de administración | Solo admin, mediante `adminGuard` |
+- Angular standalone y Angular Router.
+- TypeScript y RxJS.
+- Supabase Auth, base de datos PostgreSQL, RPC y Realtime.
+- jsPDF para generar tickets en PDF y `qrcode` para los códigos QR.
 
-### Capas principales
+## Estructura del proyecto
 
-- `pages/`: pantallas organizadas por funcionalidad: inicio, autenticación, detalle y administración.
-- `layout/`: estructura compartida alrededor de las páginas.
-- `shared/`: componentes reutilizables, como la tarjeta de película.
-- `core/services/`: sesión/autenticación (`AuthService`), acceso a películas (`PeliculasService`) y estado del CRUD del administrador (`PeliculasCrudService`).
-- `core/guards/` y `core/directivas/`: control de acceso a rutas y elementos de interfaz.
-- `models/`: tipos del dominio usados por las pantallas y servicios.
+- `src/app/pages/`: pantallas de inicio, autenticación, películas, compra, historial y administración.
+- `src/app/core/services/`: autenticación, acceso a películas, programación, reseñas y experiencia del cliente.
+- `src/app/core/guards/`: protección de rutas según autenticación y rol.
+- `src/app/layout/`: navegación y estructura compartida, incluido el pie de página.
+- `src/app/shared/`: componentes, pipes y elementos reutilizables.
+- `src/app/models/`: modelos de películas, cine, órdenes y usuarios.
+- `src/environments/`: configuración de conexión al proyecto Supabase.
 
-### Datos y flujo de películas
+## Requisitos y ejecución
 
-`AuthService` crea el cliente de Supabase y mantiene la sesión y el perfil. `PeliculasService` consulta y persiste películas, y adapta los registros a los modelos de la aplicación. Inicio y detalle consumen ese servicio directamente.
-
-En `/admin`, `AdminComponent` selecciona la sección. Para películas, `AdminPeliculasComponent` coordina formulario y listado; ambos comparten el estado y las operaciones mediante `PeliculasCrudService`, que delega la persistencia a `PeliculasService`.
-
-
-## Ejecutar el proyecto
-
-Requiere Node.js y npm. Instalar dependencias y levantar el servidor local:
+Se requiere Node.js y npm. Desde la carpeta del proyecto:
 
 ```bash
 npm install
 npm start
 ```
 
-Para generar la compilación de producción: `npm run build`.
+La aplicación queda disponible en `http://localhost:4200/`. Para compilar:
 
-## Documentación relacionada
+```bash
+npm run build
+```
 
+## Rutas
 
-- [Decisiones técnicas](DECISIONES_TECNICAS.md): motivos de las decisiones principales y límites actuales.
-- [Flujos de salas, funciones y butacas](FLUJOS_Y_DECISIONES_TECNICAS.md): configuración SQL, reglas de asignación y decisiones de reservas concurrentes.
-- [RPC administrativas de funciones](supabase/sql/funciones-admin.sql): SQL acotado para habilitar eliminación y actualización global de precios.
-- [Funciones de historial, puntos y reportes](supabase/sql/pendientes-consigna.sql): SQL idempotente para los flujos incorporados desde octubre de 2026.
-- [Comprobante de compra con QR](supabase/sql/comprobante-compra-qr.sql): RPC segura para devolver el comprobante de la orden al finalizar la selección de butacas. Debe ejecutarse en Supabase antes de usar el nuevo flujo.
-- [Edge Function para altas privilegiadas](supabase/functions/crear-usuario-privilegiado/index.ts): creación segura de usuarios empleado/admin desde el panel.
-- [Flujo de administración](src/app/pages/admin/README.md): detalle del CRUD de películas.
+| Ruta | Uso | Acceso |
+| --- | --- | --- |
+| `/` | Inicio y cartelera | Público |
+| `/login` | Inicio de sesión y registro | Público |
+| `/pelicula/:id` | Detalle y reseñas de una película | Público |
+| `/funciones/:id/butacas` | Selección de butacas y compra | Público; las reglas de edad se validan durante la compra |
+| `/ticket/:id` | Ticket de una compra | Navegación posterior a la compra |
+| `/mis-peliculas` | Entradas, historial y alertas | Usuario autenticado |
+| `/validar-qr` | Validación de entradas o Candy Bar | Empleado o administrador |
+| `/admin` | Herramientas de administración | Administrador |
 
-## Configuración de reseñas en Supabase
+## Supabase
 
-Antes de usar las reseñas, ejecutar una vez el script [resenias.sql](supabase/sql/resenias.sql) desde el SQL Editor de Supabase. Configura la reseña única por usuario y película, las políticas de acceso y la función que calcula los promedios. Revisar las políticas RLS existentes antes de aplicarlo.
+La aplicación espera un proyecto Supabase configurado y utiliza las tablas, políticas RLS y funciones RPC que respaldan las operaciones del cine. La conexión se configura en `src/environments/environment.ts` y `src/environments/environment.development.ts`.
+
+El repositorio no incluye la configuración completa de Supabase ni todos los scripts SQL que necesita la aplicación; esos elementos deben obtenerse o configurarse por separado. Sí incluye [el script para eliminar salas sin funciones asociadas](supabase/sql/eliminar-sala-sin-funciones.sql): ejecutalo una vez en el SQL Editor de Supabase antes de usar esa acción. El script comprueba el rol administrador y elimina la sala junto con sus butacas en una operación atómica. No se debe colocar una clave `service_role` en el cliente Angular.
+
+## Comandos disponibles
+
+- `npm start`: inicia el servidor de desarrollo.
+- `npm run build`: genera la compilación de la aplicación.
+- `npm test`: ejecuta las pruebas configuradas con Vitest.

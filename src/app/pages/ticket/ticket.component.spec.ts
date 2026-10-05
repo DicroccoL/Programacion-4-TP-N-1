@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { provideRouter } from '@angular/router';
 import { TicketComponent } from './ticket.component';
-import { ComprobanteCompra } from '../../core/services/programacion.service';
+import { ComprobanteCompra } from '../../core/services/compras.service';
 
 describe('TicketComponent', () => {
   const comprobante: ComprobanteCompra = {
