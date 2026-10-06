@@ -4,6 +4,7 @@ import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
 import { ComprobanteCompra } from '../../core/services/compras.service';
 import { MonedaArgentinaPipe } from '../../shared/pipes/moneda-argentina.pipe';
+import { FechaArgentinaPipe } from '../../shared/pipes/fecha-argentina.pipe';
 
 @Component({
   selector: 'app-ticket',
@@ -29,7 +30,7 @@ import { MonedaArgentinaPipe } from '../../shared/pipes/moneda-argentina.pipe';
             <div><span>N.º de orden</span><strong>{{ t.ordenId }}</strong></div>
             <div><span>Subtotal</span><strong>{{ (t.subtotal ?? t.total) | monedaArgentina }}</strong></div>
             @if ((t.descuento ?? 0) > 0 && t.codigoCupon) {
-              <div class="descuento"><span>Cupón de registro {{ t.codigoCupon }} · 20% OFF</span><strong>−{{ t.descuento | monedaArgentina }}</strong></div>
+              <div class="descuento"><span>Cupón {{ t.codigoCupon }} · {{ porcentaje(t) }}% OFF</span><strong>−{{ t.descuento | monedaArgentina }}</strong></div>
             }
             <div class="total"><span>Total</span><strong>{{ t.total | monedaArgentina }}</strong></div>
           </div>
@@ -49,6 +50,7 @@ import { MonedaArgentinaPipe } from '../../shared/pipes/moneda-argentina.pipe';
  */
 export class TicketComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly formatoFecha = new FechaArgentinaPipe();
   readonly ticket = signal<ComprobanteCompra | null>(null);
   readonly qr = signal('');
   readonly cargando = signal(true);
@@ -81,7 +83,7 @@ export class TicketComponent implements OnInit {
   }
 
   fecha(value: string): string {
-    return new Intl.DateTimeFormat('es-AR', { dateStyle: 'full', timeStyle: 'short', timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date(value));
+    return this.formatoFecha.transform(value, true);
   }
 
   /** Crea y descarga un PDF A5 con los datos de la orden y el QR. */
@@ -103,13 +105,17 @@ export class TicketComponent implements OnInit {
     pdf.text(`Orden: ${t.ordenId}`, x, y); y += 8;
     pdf.text(`Subtotal: ${this.moneda(t.subtotal ?? t.total)}`, x, y); y += 7;
     if ((t.descuento ?? 0) > 0 && t.codigoCupon) {
-      pdf.text(`Cupón de registro ${t.codigoCupon} (20% OFF): -${this.moneda(t.descuento ?? 0)}`, x, y); y += 7;
+      pdf.text(`Cupón ${t.codigoCupon} (${this.porcentaje(t)}% OFF): -${this.moneda(t.descuento ?? 0)}`, x, y); y += 7;
     }
     pdf.setFont('helvetica', 'bold'); pdf.setFontSize(13); pdf.text(`Total: ${this.moneda(t.total)}`, x, y); y += 9;
     pdf.addImage(qr, 'PNG', 49, y, 50, 50); y += 55;
     pdf.setFont('helvetica', 'normal'); pdf.setFontSize(8);
     pdf.text(pdf.splitTextToSize('Compra confirmada. El QR está listo para validar en el cine. Este sitio no procesa pagos en línea.', 116), x, y);
     pdf.save(`ticket-${t.ordenId.slice(0, 8)}.pdf`);
+  }
+
+  porcentaje(ticket: ComprobanteCompra): number {
+    return ticket.porcentajeDescuento || Math.round(((ticket.descuento ?? 0) / (ticket.subtotal || ticket.total || 1)) * 10000) / 100;
   }
 
   private moneda(value: number): string {

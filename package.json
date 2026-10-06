@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test --runner-config=vitest.config.mjs"
   },
   "private": true,
   "packageManager": "npm@12.0.2",

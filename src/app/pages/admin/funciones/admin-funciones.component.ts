@@ -6,15 +6,17 @@ import { Pelicula } from '../../../models/pelicula.model';
 import { FormatoProyeccion, Funcion, IdiomaFuncion } from '../../../models/cine.model';
 import { FechaArgentinaPipe } from '../../../shared/pipes/fecha-argentina.pipe';
 import { MonedaArgentinaPipe } from '../../../shared/pipes/moneda-argentina.pipe';
+import { SelectorFechaComponent } from '../../../shared/components/selector-fecha/selector-fecha.component';
 
 @Component({
-  selector: 'app-admin-funciones', standalone: true, imports: [FormsModule, FechaArgentinaPipe, MonedaArgentinaPipe],
+  selector: 'app-admin-funciones', standalone: true, imports: [FormsModule, FechaArgentinaPipe, MonedaArgentinaPipe, SelectorFechaComponent],
   template: `
     <section class="programacion-admin">
       <div><h3>Programar función</h3><p>La sala compatible se asigna automáticamente según formato, idioma y disponibilidad.</p></div>
       <form class="form-programacion" (ngSubmit)="crear()">
         <label>Película<select name="pelicula" required [(ngModel)]="peliculaId"><option value="" disabled>Elegí una película</option>@for (p of peliculas(); track p.id) {<option [value]="p.id">{{ p.titulo }} · {{ p.duracionMin }} min</option>}</select></label>
-        <label>Fecha y hora<input name="inicio" type="datetime-local" required [min]="minInicio" [(ngModel)]="inicio" /></label>
+        <label>Fecha<app-selector-fecha id="fecha-funcion" name="fecha" required [(ngModel)]="fechaInicio" [bloqueado]="guardando()" /></label>
+        <label>Hora<input name="hora" type="time" required [(ngModel)]="horaInicio" /></label>
         <label>Formato<select name="formato" [(ngModel)]="formato">@for (f of formatos; track f) {<option [value]="f">{{ f }}</option>}</select></label>
         <label>Idioma<select name="idioma" [(ngModel)]="idioma"><option value="CASTELLANO">Castellano</option><option value="SUBTITULADA">Subtitulada</option></select></label>
         <button class="accion-principal" type="submit" [disabled]="guardando()">{{ guardando() ? 'Buscando sala…' : 'Crear función' }}</button>
@@ -39,8 +41,9 @@ export class AdminFuncionesComponent implements OnInit {
   readonly guardando = signal(false); readonly error = signal(''); readonly mensaje = signal('');
   readonly eliminando = signal<string | null>(null);
   peliculaId = ''; formato: FormatoProyeccion = '2D'; idioma: IdiomaFuncion = 'CASTELLANO';
-  minInicio = this.fechaMinuto(new Date(Date.now() + 60_000));
-  inicio = this.fechaMinuto(new Date(Date.now() + 60 * 60 * 1000));
+  fechaInicio = this.fechaMinuto(new Date(Date.now() + 60 * 60 * 1000)).slice(0,10);
+  horaInicio = this.fechaMinuto(new Date(Date.now() + 60 * 60 * 1000)).slice(11);
+  get inicio(): string { return this.fechaInicio && this.horaInicio ? `${this.fechaInicio}T${this.horaInicio}` : ''; }
   async ngOnInit(): Promise<void> {
     try { this.peliculas.set(await this.peliculasService.obtenerTodas()); await this.cargarFunciones(); }
     catch (e) { this.error.set(`No se pudieron cargar los datos: ${this.detalleError(e)}`); }
@@ -49,8 +52,8 @@ export class AdminFuncionesComponent implements OnInit {
   async crear(): Promise<void> {
     this.error.set(''); this.mensaje.set(''); this.guardando.set(true);
     try {
-      this.minInicio = this.fechaMinuto(new Date(Date.now() + 60_000));
-      if (!this.inicio || new Date(this.inicio).getTime() <= Date.now()) {
+      if (!this.peliculaId) throw new Error('Seleccioná una película.');
+      if (!this.inicio || !Number.isFinite(new Date(this.inicio).getTime()) || new Date(this.inicio).getTime() <= Date.now()) {
         this.error.set('Elegí una fecha y hora futura. La función no puede comenzar en el pasado.');
         return;
       }
@@ -61,7 +64,7 @@ export class AdminFuncionesComponent implements OnInit {
     finally { this.guardando.set(false); }
   }
   async eliminar(funcion: Funcion): Promise<void> {
-    if (!window.confirm(`¿Eliminar la función del ${funcion.fechaHoraInicio}?`)) return;
+    if (!window.confirm(`¿Eliminar la función del ${new FechaArgentinaPipe().transform(funcion.fechaHoraInicio,true)}?`)) return;
     this.error.set(''); this.mensaje.set(''); this.eliminando.set(funcion.id);
     try {
       await this.programacion.eliminarFuncion(funcion.id);

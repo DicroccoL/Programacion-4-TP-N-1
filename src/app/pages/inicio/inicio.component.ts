@@ -2,6 +2,7 @@ import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular
 import { RouterLink } from '@angular/router';
 import { GENEROS_PELICULA, Pelicula } from '../../models/pelicula.model';
 import { PeliculasService } from '../../core/services/peliculas.service';
+import { CuponesService } from '../../core/services/cupones.service';
 import { TarjetaPeliculaComponent } from '../../shared/components/tarjeta-pelicula/tarjeta-pelicula.component';
 import { ReseniasService, ResumenResenias } from '../../core/services/resenias.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -17,6 +18,8 @@ import { Router } from '@angular/router';
 })
 export class InicioComponent implements OnInit, OnDestroy {
   private readonly peliculasService = inject(PeliculasService);
+  private readonly cuponesService = inject(CuponesService);
+  readonly porcentajePrimeraCompra = signal<number | null>(null);
   private readonly reseniasService = inject(ReseniasService);
   private readonly auth = inject(AuthService);
   private readonly experiencia = inject(ExperienciaClienteService);
@@ -55,6 +58,8 @@ export class InicioComponent implements OnInit, OnDestroy {
 
   // Consulta en paralelo el servicio de películas para cargar cartelera y próximos estrenos.
   async ngOnInit(): Promise<void> {
+    void this.cuponesService.obtenerPorcentajePrimeraCompra()
+      .then(porcentaje => this.porcentajePrimeraCompra.set(porcentaje)).catch(() => {});
     try {
       const [cartelera, proximas] = await Promise.all([
         this.peliculasService.obtenerCartelera(),

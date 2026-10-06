@@ -2,6 +2,7 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ExperienciaClienteService, MiAlertaEstreno, MiPelicula } from '../../core/services/experiencia-cliente.service';
+import { FechaArgentinaPipe } from '../../shared/pipes/fecha-argentina.pipe';
 
 @Component({
   selector: 'app-mis-peliculas', standalone: true, imports: [RouterLink],
@@ -40,6 +41,7 @@ import { ExperienciaClienteService, MiAlertaEstreno, MiPelicula } from '../../co
 export class MisPeliculasComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly experiencia = inject(ExperienciaClienteService);
+  private readonly formatoFecha = new FechaArgentinaPipe();
   readonly peliculas = signal<MiPelicula[]>([]);
   readonly alertas = signal<MiAlertaEstreno[]>([]);
   readonly cargando = signal(true);
@@ -58,7 +60,7 @@ export class MisPeliculasComponent implements OnInit {
     catch { this.error.set('No se pudo cargar el historial. Confirmá que la migración de historial esté aplicada en Supabase.'); }
     finally { this.cargando.set(false); }
   }
-  fecha(value: string): string { return new Intl.DateTimeFormat('es-AR',{dateStyle:'medium',timeStyle:'short',timeZone:'America/Argentina/Buenos_Aires'}).format(new Date(value)); }
+  fecha(value: string): string { return this.formatoFecha.transform(value,true); }
   moneda(value:number):string{return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(value);}
   idioma(value:string):string{return value==='SUBTITULADA'?'Subtitulada':'Castellano';}
 

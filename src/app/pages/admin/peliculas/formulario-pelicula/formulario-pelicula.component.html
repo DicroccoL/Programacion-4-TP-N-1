@@ -151,6 +151,11 @@
           @else if (imagen.errors?.['pattern']) { Ingresá una URL http o https válida. }
         </span>
       }
+      <label for="archivo-poster">O subir imagen desde tu PC</label>
+      <input id="archivo-poster" type="file" accept="image/jpeg,image/png,image/webp" [disabled]="subiendoImagen() || crud.guardando()" (change)="subirImagen($event)" />
+      <small>JPG, PNG o WebP · Máximo 5 MB. Al subirla se completa la URL.</small>
+      @if (subiendoImagen()) { <span role="status">Subiendo imagen…</span> }
+      @if (errorImagen()) { <span class="error-campo" role="alert">{{ errorImagen() }}</span> }
     </div>
 
     <div class="campo campo-amplio">
@@ -187,7 +192,7 @@
     </label>
 
     <div class="acciones-form">
-      <button type="submit" class="btn-principal" [disabled]="crud.guardando()">
+      <button type="submit" class="btn-principal" [disabled]="crud.guardando() || subiendoImagen()">
         {{ crud.guardando() ? 'Guardando...' : (crud.peliculaEditandoId() ? 'Guardar cambios' : 'Crear película') }}
       </button>
     </div>

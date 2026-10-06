@@ -18,8 +18,9 @@ export class ButacasService {
   constructor(private readonly auth: AuthService) {}
 
   /**
-   * Obtiene las butacas de la sala asociada a la función y marca las vendidas.
-   * Las reservas temporales activas se consultan con obtenerReservasActivas.
+   * Obtiene las butacas de la sala y marca la ocupación devuelta por la RPC:
+   * entradas pagadas y reservas activas. obtenerReservasActivas permite a la
+   * pantalla distinguir reservas ajenas de la selección propia.
    */
   async obtenerButacas(funcionId: string): Promise<Butaca[]> {
     const { data: funcion, error: errorFuncion } = await this.auth.client

@@ -39,7 +39,7 @@
         @else {
           <ul>@for (butaca of seleccionadas(); track butaca.id) {<li><span>{{ butaca.fila }}{{ butaca.numero }}<small>{{ butaca.tipo === 'VIP' ? ' · VIP' : butaca.tipo === 'ACCESIBLE' ? ' · Accesible' : '' }}</small></span><strong>{{ precio(butaca) | monedaArgentina }}</strong><button type="button" aria-label="Quitar butaca" (click)="alternar(butaca)">×</button></li>}</ul>
           <div class="subtotal"><span>Subtotal</span><strong>{{ subtotal() | monedaArgentina }}</strong></div>
-          <div class="total"><span>Total</span><strong>{{ subtotal() | monedaArgentina }}</strong></div>
+          <div class="total"><span>Total antes de descuentos</span><strong>{{ subtotal() | monedaArgentina }}</strong></div>
           @if (edadMinima()) {
             <div class="control-edad"><strong>Clasificación {{ f.pelicula?.clasificacion }}</strong>
               @if (!usuarioAutenticado()) {
@@ -50,6 +50,10 @@
                 @if (edadActual() !== null && edadActual()! < edadMinima()) {<p>Las personas menores de {{ edadMinima() }} años deben concurrir acompañadas por una persona adulta responsable.</p><label><input type="checkbox" [checked]="asisteAdulto()" (change)="asisteAdulto.set($any($event.target).checked)"> Confirmo que asistirá con una persona adulta.</label>}
               }
             </div>
+          }
+          @if (usuarioAutenticado()) {
+            <label>Cupón de descuento<input type="text" name="codigoCupon" maxlength="30" [(ngModel)]="codigoCupon" placeholder="Código del cupón"></label>
+            <small>Se valida al confirmar. Se aplica el mayor descuento disponible y se detalla en el ticket.</small>
           }
           <button class="comprar" type="button" [disabled]="comprando() || compraBloqueadaEdad()" (click)="comprar()">{{ comprando() ? 'Procesando…' : 'Comprar' }}</button>
           <small class="nota-pago">Al tocar Comprar se genera la orden y se abre tu ticket con QR válido. No se procesa un pago online.</small>

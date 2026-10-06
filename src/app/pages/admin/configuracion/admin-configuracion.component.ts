@@ -1,9 +1,10 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AdminCuponesComponent } from './admin-cupones.component';
 import { SalasFuncionesService } from '../../../core/services/salas-funciones.service';
 
 @Component({
-  selector: 'app-admin-configuracion', standalone: true, imports: [FormsModule],
+  selector: 'app-admin-configuracion', standalone: true, imports: [FormsModule, AdminCuponesComponent],
   template: `
     <section class="configuracion-admin">
       <header><h3>Configuración</h3><p>Definí el precio general de las entradas. Se aplicará a las nuevas funciones.</p></header>
@@ -20,6 +21,7 @@ import { SalasFuncionesService } from '../../../core/services/salas-funciones.se
       }
       @if (mensaje()) {<p class="aviso exito" role="status">{{ mensaje() }}</p>}
       @if (error()) {<p class="aviso error" role="alert">{{ error() }}</p>}
+      <app-admin-cupones />
     </section>
   `,
   styles: [`

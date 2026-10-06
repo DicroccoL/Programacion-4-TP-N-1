@@ -7,6 +7,7 @@ export interface ComprobanteCompra {
   codigoQr: string;
   subtotal?: number;
   descuento?: number;
+  porcentajeDescuento?: number;
   codigoCupon?: string | null;
   total: number;
   fechaCompra: string;
@@ -42,6 +43,7 @@ export class ComprasService {
     token: string,
     fechaNacimiento: string | null,
     asisteAdulto: boolean,
+    codigoCupon: string | null = null,
   ): Promise<ComprobanteCompra> {
     const { data, error } = await this.auth.client.rpc('comprar_orden_con_comprobante', {
       p_funcion_id: funcionId,
@@ -49,6 +51,7 @@ export class ComprasService {
       p_token: token,
       p_fecha_nacimiento: fechaNacimiento,
       p_asiste_adulto: asisteAdulto,
+      p_codigo_cupon: codigoCupon?.trim().toUpperCase() || null,
     });
     if (error) throw error;
 
@@ -61,6 +64,7 @@ export class ComprasService {
       total: Number(row['total']),
       subtotal: Number(row['subtotal'] ?? row['total']),
       descuento: Number(row['descuento'] ?? 0),
+      porcentajeDescuento: Number(row['porcentaje_descuento'] ?? 0),
       codigoCupon: row['codigo_cupon'] == null ? null : String(row['codigo_cupon']),
       fechaCompra: String(row['fecha_compra']),
       estado: String(row['estado']),

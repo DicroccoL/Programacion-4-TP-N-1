@@ -21,7 +21,7 @@
       <div class="hero-sidebar">
   <div class="sidebar-block sidebar-promo">
     <span class="promo-tag">BENEFICIO EXCLUSIVO</span>
-    <h3 class="promo-title">20% de descuento en tu primera compra</h3>
+    <h3 class="promo-title">{{ porcentajePrimeraCompra() ? porcentajePrimeraCompra() + '% de descuento en tu primera compra' : 'Beneficios para usuarios registrados' }}</h3>
     <p class="promo-desc">Creá tu cuenta en 1 minuto para acceder a cupones automáticos y acumulación de puntos por cada entrada o combo del Candy Bar.</p>
     <a [routerLink]="['/login']" [queryParams]="{ tab: 'register' }" class="promo-link">Crear cuenta gratuita →</a>
   </div>

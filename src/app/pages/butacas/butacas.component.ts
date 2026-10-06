@@ -35,6 +35,7 @@ export class ButacasComponent implements OnInit, OnDestroy {
   readonly fechaNacimientoAnonima = signal('');
   readonly asisteAdulto = signal(false);
   readonly avisoEdadLeido = signal(false);
+  codigoCupon = '';
   readonly subtotal = computed(() => this.seleccionadas().reduce((total, butaca) => total + this.precio(butaca), 0));
   readonly edadMinima = computed(() => this.funcion()?.pelicula?.clasificacion === '+18' ? 18 : this.funcion()?.pelicula?.clasificacion === '+13' ? 13 : 0);
   readonly preventaBloqueada = computed(() => {
@@ -128,7 +129,9 @@ export class ButacasComponent implements OnInit, OnDestroy {
     try {
       const comprobante = await this.comprasService.crearOrden(this.funcionId,
         this.seleccionadas().map(b => b.id), this.token, this.usuarioAutenticado() ? (this.fechaNacimiento() || null) : null,
-        this.usuarioAutenticado() ? this.asisteAdulto() : this.avisoEdadLeido());
+        this.usuarioAutenticado() ? this.asisteAdulto() : this.avisoEdadLeido(), this.codigoCupon);
+      // La compra ya se confirmó: un fallo al recargar puntos no debe ocultar el ticket.
+      try { await this.auth.refreshCurrentProfile(); } catch { /* Se recargará al volver a iniciar sesión. */ }
       try { sessionStorage.setItem(`ticket:${comprobante.ordenId}`, JSON.stringify(comprobante)); } catch { /* La navegación conserva el ticket en history.state. */ }
       this.seleccionadas.set([]);
       await this.router.navigate(['/ticket', comprobante.ordenId], { state: { comprobante } });
