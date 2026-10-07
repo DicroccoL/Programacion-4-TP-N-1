@@ -39,7 +39,7 @@ El servicio no llama a un componente para modificar su HTML. Devuelve una Promis
 | AdminSalas / AdminFunciones / AdminConfiguracion | SalasFuncionesService | Salas, programación y precio global |
 | AdminCupones | CuponesService | Configura primera compra y cupones |
 | AdminUsuarios | AuthService.client.functions directamente | Invoca la Edge Function de creación de personal |
-| AdminReportes | AuthService.client.rpc directamente | Reportes, pendientes, confirmación manual y auditoría |
+| AdminReportes | ReportesService | Filtros, ventas, actividad reciente, CSV e impresión |
 
 La división por servicios evita repetir consultas. `PeliculasCrudService` agrega estado de administración sobre `PeliculasService`, que se ocupa del acceso a datos. `SalasFuncionesService` conserva planificación; butacas y compras tienen servicios propios. El antiguo nombre `ProgramacionService` fue reemplazado por `SalasFuncionesService`.
 
@@ -60,7 +60,7 @@ La división por servicios evita repetir consultas. `PeliculasCrudService` agreg
 13. Mis películas requiere sesión. Consulta órdenes pagadas y alertas; muestra puntos y crédito del perfil. Puede cancelar una orden propia con más de dos horas de anticipación.
 14. Empleados y administradores validan el QR. La RPC comprueba que la orden esté pagada, que tenga entradas o productos según el tipo, y que ese uso del código no se haya consumido.
 
-**Detalle para el oral:** el sitio todavía no integra una pasarela de pago. El flujo actual de compra marca automáticamente la orden como pagada. También existe una herramienta administrativa para confirmar órdenes pendientes. No describas esto como un cobro bancario implementado.
+**Detalle para el oral:** el sitio todavía no integra una pasarela de pago. El flujo actual de compra marca automáticamente la orden como pagada. Se retiró la herramienta administrativa de pendientes y confirmación manual porque ya no corresponde a ese flujo. No describas esto como un cobro bancario implementado.
 
 Rutas y guards: [app.routes.ts](C:/Users/uld001/Desktop/Programacion-4-TP-N-1/src/app/app.routes.ts).
 
@@ -70,7 +70,7 @@ Las dos familias tradicionales son **template-driven** y **reactivos**. La docum
 
 | Tipo | Cómo se construye | Dónde se usa en el proyecto | Motivo |
 |---|---|---|---|
-| Template-driven | FormsModule, `[(ngModel)]`, `name`, NgForm y atributos de validación | Login, películas, reseñas, usuarios admin, salas, funciones, configuración, cupones, filtros de reportes y datos de butacas | Formularios sencillos y cercanos a su plantilla |
+| Template-driven | FormsModule, `[(ngModel)]`, `name`, NgForm y atributos de validación | Login, películas, reseñas, usuarios admin, salas, funciones, configuración, cupones y datos de butacas | Formularios sencillos y cercanos a su plantilla |
 | Reactivo | ReactiveFormsModule, FormBuilder, FormGroup, controles y Validators definidos en TypeScript | RegistroComponent | Varios campos con reglas y mensajes; permite controlar estado y validación desde la clase |
 | Signal Forms | Modelo basado en signals y API específica de formularios | No se usa | No hace falta migrar para explicar el código existente |
 
@@ -88,7 +88,7 @@ Solo se piden **nombre, apellido, correo, contraseña y rol**. La contraseña m�
 
 `SelectorFechaComponent` implementa `ControlValueAccessor`: es el puente entre el control personalizado y NgModel/FormControlName. `writeValue` recibe el valor del formulario; `registerOnChange` comunica cambios hacia el formulario; `registerOnTouched` comunica interacción; `setDisabledState` permite deshabilitarlo. Divide día, mes y año, selecciona un segmento al enfocarlo y devuelve `YYYY-MM-DD` cuando la fecha está completa y es real. Si es inválida o incompleta devuelve cadena vacía.
 
-Se usa en registro, estreno de película, datos de clasificación de butacas, fechas de reportes y programación de funciones. En programación la fecha usa el selector y la hora un control `time`. Los reportes rechazan fechas vacías y rangos invertidos. El selector no abre un calendario.
+Se usa en registro, estreno de película, datos de clasificación de butacas y programación de funciones. En programación la fecha usa el selector y la hora un control `time`. El selector no abre un calendario. Reportes calcula las fechas automáticamente mediante los botones Hoy (por día), últimos 7 días y últimos 30 días; no tiene campos de fechas manuales.
 
 **Límite actual:** en un campo opcional, una fecha incompleta puede llegar como vacío. Eso no convierte al selector en un validador general de todos los formularios; los campos obligatorios necesitan `required` y las reglas de negocio correspondientes.
 
@@ -125,7 +125,7 @@ Está en el constructor de [AuthService](C:/Users/uld001/Desktop/Programacion-4-
 |---|---|---|
 | `client.auth` | Login, registro, sesión y cierre | AuthService |
 | `client.from('tabla')` | Lectura/escritura de datos, sujeta a RLS | PeliculasService, ReseniasService, ButacasService, ExperienciaClienteService y CuponesService; PerfilService lee perfiles usando el cliente que le pasa AuthService |
-| `client.rpc('funcion')` | Ejecuta una función PostgreSQL | SalasFuncionesService, ButacasService, ComprasService, ReseniasService, ExperienciaClienteService; directamente AdminReportes y ValidarQr |
+| `client.rpc('funcion')` | Ejecuta una función PostgreSQL | SalasFuncionesService, ButacasService, ComprasService, ReseniasService, ExperienciaClienteService y ReportesService; directamente ValidarQr |
 | `client.channel(...).on(...).subscribe()` | Recibe avisos de cambios | ButacasService |
 | `client.removeChannel(...)` | Cierra la suscripción al salir | ButacasComponent.ngOnDestroy |
 | `client.functions.invoke(...)` | Ejecuta lógica del servidor con permisos de servidor | AdminUsuariosComponent |
@@ -300,12 +300,11 @@ Se encontró y corrigió una incompatibilidad: `log_actividad.usuario_id` no ace
 
 ### Reportes
 
-AdminReportes.cargar ejecuta cinco RPC en paralelo: ventas diarias, órdenes pendientes, películas vendidas, productos vendidos y log de actividad. Si una falla, informa error y no aplica ese conjunto como una carga completa.
+AdminReportes calcula el rango del período elegido y cargar llama a ReportesService.obtenerReportes. Las opciones son Hoy (por día), últimos 7 días y últimos 30 días; inicialmente se muestran 30 días. El servicio ejecuta cuatro RPC en paralelo: ventas diarias, películas vendidas, productos vendidos y log de actividad. Si una falla, informa error y no aplica ese conjunto como una carga completa. El componente mantiene las señales y presentación; su HTML y CSS están en archivos separados. Se retiraron la tabla de pagos pendientes, su consulta y la confirmación manual del código Angular; las funciones históricas del servidor no se eliminaron.
 
 | RPC | Qué calcula |
 |---|---|
 | obtener_reporte_ventas_diarias | Filtra órdenes PAGADA del período; suma total por día y cuenta entradas por separado, evitando multiplicar la facturación al unir una orden con varias entradas |
-| obtener_ordenes_pendientes_admin | Órdenes para la confirmación manual administrativa |
 | obtener_reporte_peliculas_vendidas | Cuenta entradas pagadas por película; limita a veinte |
 | obtener_reporte_candy_vendido | Suma cantidades de orden_candy, con nombre de producto o combo; limita a veinte |
 | obtener_log_actividad_admin | Actividad reciente, hasta 500 registros |
@@ -400,6 +399,7 @@ Script repetible: [alertas-estreno.sql](C:/Users/uld001/Desktop/Programacion-4-T
 | ExperienciaClienteService | obtenerMasVendidas, activarAlerta, obtenerAlertasActivas, obtenerMisAlertasEstreno, obtenerMisComprobantes, obtenerMisPeliculas, cancelarMiOrden |
 | CuponesService | obtenerPorcentajePrimeraCompra, guardarPorcentajePrimeraCompra, listar, guardar |
 | ImagenesService | subirPoster |
+| ReportesService | obtenerReportes, exportarVentasCsv; lo usa AdminReportesComponent |
 
 `obtenerMisComprobantes` existe en ExperienciaClienteService, pero MisPeliculas usa el historial que ya incluye QR. No inventar un consumidor de un método por el hecho de que exista.
 
@@ -415,7 +415,7 @@ Los componentes de página administran carga, selección y errores; los componen
 - SelectorFecha implementa CVA para integrarse con ambas familias de formularios, sin obligar a cada página a duplicar segmentos y conversión.
 - AdminCupones se separa de AdminConfiguracion para que la gestión de promociones no mezcle su formulario/estado con el precio base de entradas.
 
-No toda la lógica está completamente aislada en servicios: AdminReportes, AdminUsuarios y ValidarQr todavía llaman directamente al cliente compartido. Esa es la arquitectura real a explicar, y una posible división futura si crecen esos módulos.
+No toda la lógica está completamente aislada en servicios: AdminUsuarios y ValidarQr todavía llaman directamente al cliente compartido. AdminReportes delega sus consultas en ReportesService. Esa es la arquitectura real a explicar, y una posible división futura si crecen esos módulos.
 
 ## 17. Respuesta corta para el profesor
 

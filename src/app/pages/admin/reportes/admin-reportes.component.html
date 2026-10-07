@@ -1,0 +1,84 @@
+<section class="reportes">
+  <header>
+    <h3>Ventas y auditoría</h3>
+    <p>Consultá ventas confirmadas, revisá la actividad y exportá el resumen.</p>
+  </header>
+  <section class="panel">
+    <h4>Consultar ventas</h4>
+    <div class="rango">
+      <button type="button" (click)="periodo(1)">Hoy (por día)</button>
+      <button type="button" (click)="periodo(7)">Últimos 7 días</button>
+      <button type="button" (click)="periodo(30)">Últimos 30 días</button>
+      <button type="button" (click)="cargar()">Actualizar</button>
+      <button type="button" (click)="exportarCsv()">Exportar Excel (CSV)</button>
+      <button type="button" (click)="imprimir()">Guardar PDF</button>
+    </div>
+  </section>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  <section class="panel imprimible">
+    <h4>Facturación diaria y entradas vendidas</h4>
+    @if (ventas().length) {
+      <div class="tabla-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Día</th>
+              <th>Facturación</th>
+              <th>Entradas</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (v of ventas(); track v.dia) {
+              <tr>
+                <td>{{ v.dia | fechaArgentina }}</td>
+                <td>{{ moneda(v.facturacion) }}</td>
+                <td>{{ v.entradas_vendidas }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    } @else {
+      <p>Sin ventas confirmadas en este período.</p>
+    }
+  </section>
+  <section class="panel">
+    <h4>Películas más vistas</h4>
+    @for (p of peliculas(); track p.pelicula_id) {
+      <div class="barra-fila">
+        <span>{{ p.titulo }}</span>
+        <div><i [style.width.%]="ancho(p.entradas_vendidas, maxPelicula())"></i></div>
+        <strong>{{ p.entradas_vendidas }}</strong>
+      </div>
+    }
+    @if (!peliculas().length) {
+      <p>No hay ventas para el período.</p>
+    }
+  </section>
+  <section class="panel">
+    <h4>Productos más vendidos</h4>
+    @for (p of productos(); track p.producto) {
+      <div class="barra-fila">
+        <span>{{ p.producto }}</span>
+        <div><i [style.width.%]="ancho(p.cantidad_vendida, maxCandy())"></i></div>
+        <strong>{{ p.cantidad_vendida }}</strong>
+      </div>
+    }
+    @if (!productos().length) {
+      <p>Sin ventas de Candy Bar en el período.</p>
+    }
+  </section>
+  <section class="panel">
+    <h4>Actividad reciente</h4>
+    @for (a of actividades(); track a.actividad_id) {
+      <p>
+        {{ fecha(a.fecha_hora) }} · {{ a.correo || 'Sistema' }} · {{ a.accion }} — {{ a.detalle }}
+      </p>
+    }
+    @if (!actividades().length) {
+      <p>No hay actividad registrada o falta ejecutar la migración de auditoría.</p>
+    }
+  </section>
+</section>

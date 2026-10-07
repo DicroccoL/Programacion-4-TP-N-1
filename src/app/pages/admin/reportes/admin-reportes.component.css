@@ -1,0 +1,85 @@
+.reportes {
+  display: grid;
+  gap: 1rem;
+  color: var(--text-primary);
+}
+.reportes header p,
+.panel p {
+  color: var(--text-secondary);
+}
+.panel {
+  padding: 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+}
+.panel h4 {
+  margin: 0 0 0.8rem;
+}
+.rango {
+  display: flex;
+  gap: 0.75rem;
+  align-items: end;
+  flex-wrap: wrap;
+}
+button {
+  padding: 0.6rem 0.8rem;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--accent-crimson);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+button:disabled {
+  opacity: 0.6;
+}
+.tabla-scroll {
+  overflow: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  padding: 0.7rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.barra-fila {
+  display: grid;
+  grid-template-columns: minmax(100px, 210px) minmax(80px, 1fr) 44px;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0;
+}
+.barra-fila > div {
+  height: 12px;
+  border-radius: 10px;
+  background: var(--bg-input);
+  overflow: hidden;
+}
+.barra-fila i {
+  display: block;
+  height: 100%;
+  border-radius: 10px;
+  background: var(--accent-crimson);
+}
+.error {
+  color: #fda4af;
+}
+@media print {
+  .rango,
+  button {
+    display: none !important;
+  }
+  .panel {
+    break-inside: avoid;
+    background: white;
+    color: black;
+  }
+  .reportes {
+    color: black;
+  }
+}

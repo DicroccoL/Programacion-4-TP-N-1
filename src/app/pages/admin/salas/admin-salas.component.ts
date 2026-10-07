@@ -44,16 +44,28 @@ import { SalasFuncionesService } from '../../../core/services/salas-funciones.se
 })
 /** Gestiona salas y sus butacas, incluyendo creación y eliminación segura. */
 export class AdminSalasComponent implements OnInit {
+  // Servicio que consulta Supabase y llama a las operaciones de crear/borrar salas.
   private readonly programacion = inject(SalasFuncionesService);
+  // Opciones disponibles; cada sala se crea con un solo formato y un solo idioma.
   readonly formatos: FormatoProyeccion[] = ['2D','3D'];
   readonly idiomas: IdiomaFuncion[] = ['CASTELLANO','SUBTITULADA'];
   readonly formatoElegido = signal<FormatoProyeccion>('2D');
   readonly idiomaElegido = signal<IdiomaFuncion>('CASTELLANO');
+  // Estado de la lista y de las operaciones; el HTML lee estas señales.
   readonly salas = signal<Sala[]>([]); readonly guardando = signal(false);
   readonly eliminandoSalaId = signal<string | null>(null);
   readonly error = signal(''); readonly mensaje = signal(''); numero = 1;
+
+  /** Al abrir Salas y Butacas, consulta las salas existentes. */
   async ngOnInit(): Promise<void> { await this.cargar(); }
+
+  /** Convierte los códigos de idioma de una sala en texto para mostrar en la lista. */
   idiomasTexto(sala: Sala): string { return (sala.idiomas ?? []).map(i => i === 'CASTELLANO' ? 'Castellano' : 'Subtitulada').join(' · '); }
+
+  /** Envía número, formato e idioma al servicio; Supabase crea sala y butacas.
+   * Después recarga la lista, muestra el resultado y propone el próximo número libre.
+   * guardando bloquea los botones durante la operación y se limpia en finally.
+   */
   async crear(): Promise<void> {
     this.error.set(''); this.mensaje.set('');
     this.guardando.set(true);
@@ -70,6 +82,12 @@ export class AdminSalasComponent implements OnInit {
     }
     finally { this.guardando.set(false); }
   }
+
+  /** Pide confirmación y solicita el borrado al servicio.
+   * Supabase comprueba que sea admin y que la sala no tenga funciones asociadas.
+   * Vuelve a consultar para comprobar que desapareció y actualiza la lista.
+   * Si falta la RPC, muestra una indicación específica; finally libera los botones.
+   */
   async eliminar(sala: Sala): Promise<void> {
     const confirmar = confirm(
       `¿Querés eliminar la sala ${sala.numero}? Solo se puede borrar si no tiene funciones asociadas.`,
@@ -110,16 +128,26 @@ export class AdminSalasComponent implements OnInit {
       this.eliminandoSalaId.set(null);
     }
   }
+
+  /** Obtiene las salas del servidor y sugiere un número disponible para el formulario.
+   * Si la consulta falla, guarda el mensaje de error que presenta el HTML.
+   */
   private async cargar(): Promise<void> {
     try { this.salas.set(await this.programacion.listarSalas()); this.numero = this.siguienteNumero(); }
     catch (e) { this.error.set(`No se pudieron cargar las salas: ${this.detalleError(e)}`); }
   }
+
+  /** Busca el primer número libre desde 1; reutiliza los huecos de salas eliminadas.
+   * Es una sugerencia local: el servidor controla que el número no esté duplicado.
+   */
   private siguienteNumero(): number {
     const usados = new Set(this.salas().map(s => s.numero));
     let candidato = 1;
     while (usados.has(candidato)) candidato++;
     return candidato;
   }
+
+  /** Adapta errores de creación: RPC faltante, permisos o número de sala duplicado. */
   private errorRpc(detalle: string): string {
     const normalized = detalle.toLowerCase();
     if (normalized.includes('crear_sala_con_butacas') && (normalized.includes('does not exist') || normalized.includes('could not find the function') || normalized.includes('schema cache'))) {
@@ -133,6 +161,10 @@ export class AdminSalasComponent implements OnInit {
     }
     return `No se pudo crear la sala: ${detalle}`;
   }
+
+  /** Extrae texto de un Error, una cadena o la respuesta de error de Supabase.
+   * Reúne message, details, hint y code para conservar el detalle del problema.
+   */
   private detalleError(error: unknown): string {
     if (error instanceof Error) return error.message;
     if (typeof error === 'string') return error;

@@ -1,6 +1,6 @@
 # WildeCinemas: contexto actual para continuar el proyecto
 
-Actualizado: 6 de octubre de 2026. Documento para estudiar, trasladar el trabajo a otra computadora o compartir el contexto con otro asistente.
+Actualizado: 7 de octubre de 2026. Documento para estudiar, trasladar el trabajo a otra computadora o compartir el contexto con otro asistente. El PDF generado el día 6 es una versión anterior; este Markdown incluye la separación posterior de reportes.
 
 ## 1. Objetivo del usuario
 
@@ -25,7 +25,7 @@ Flujo general: usuario -> componente -> servicio Angular -> cliente Supabase com
 
 AuthService crea una única instancia de Supabase desde los archivos de src/environments y expone el getter client. Los servicios de datos reutilizan esa instancia. PerfilService recibe el cliente y el usuario como argumentos; SesionService no necesita conectarse a Supabase.
 
-Existen accesos directos desde componentes: AdminUsuarios invoca una Edge Function; AdminReportes invoca RPC de reportes; ValidarQr invoca validar_qr_orden; Butacas limpia el canal Realtime. No afirmar que absolutamente toda consulta pasa por un servicio específico de dominio.
+Existen accesos directos desde componentes: AdminUsuarios invoca una Edge Function; ValidarQr invoca validar_qr_orden; Butacas limpia el canal Realtime. AdminReportes ahora consulta mediante ReportesService. No afirmar que absolutamente toda consulta pasa por un servicio específico de dominio.
 
 La autorización real y las reglas transaccionales se ejecutan en Supabase mediante RLS, RPC y triggers. Los guards controlan navegación; la directiva y los bloques @if controlan lo que se muestra.
 
@@ -55,6 +55,7 @@ La autorización real y las reglas transaccionales se ejecutan en Supabase media
 - ExperienciaClienteService: ranking, alertas, historial y cancelaciones. Se usa principalmente en Inicio y MisPeliculas.
 - CuponesService: consulta y administra promociones. Se usa en configuración y para mostrar la promoción de Inicio.
 - ImagenesService: valida y sube pósters a Storage. Se usa en FormularioPelicula.
+- ReportesService: consulta reportes y genera/descarga el CSV. Se usa en AdminReportesComponent.
 
 ## 6. División reciente de AuthService
 
@@ -124,7 +125,7 @@ Registro usa formularios reactivos (FormBuilder, FormGroup, Validators). Varias 
 
 SelectorFechaComponent implementa ControlValueAccessor: permite editar DD/MM/AAAA por segmentos, filtra caracteres no numéricos y comunica una fecha ISO completa y válida o una cadena vacía. Se integra con formularios reactivos y NgModel. No abre calendario; técnicamente sus segmentos son inputs de texto.
 
-Se implementó en los lugares faltantes de programación y reportes. AdminFunciones separa fecha y hora, y valida inicio futuro. Reportes valida fechas completas y rango no invertido. La revisión no encontró type=date ni datetime-local en src/app.
+Se implementó en los lugares faltantes de programación. AdminFunciones separa fecha y hora, y valida inicio futuro. Reportes ahora ofrece botones Hoy (por día), últimos 7 días y últimos 30 días: calcula el rango automáticamente y se retiraron los selectores manuales Desde/Hasta y su validación. La revisión no encontró type=date ni datetime-local en src/app.
 
 FechaArgentinaPipe formatea fechas y protege la presentación ante valores inválidos; para fechas sin hora evita el cambio de día por zona horaria. Se reutilizó en Ticket, MisPeliculas, reportes y mensajes de funciones. MonedaArgentinaPipe presenta ARS. DecimalPipe se usa para promedios. Los pipes no reemplazan las validaciones del formulario ni del servidor.
 
@@ -186,7 +187,11 @@ Auditoría combina triggers de cambios de tablas con logs explícitos de algunas
 
 Se corrigió log_actividad.usuario_id para permitir NULL: las operaciones sin auth.uid se muestran como Sistema. Se agregaron triggers para los nuevos cupones/configuración. El cambio se aplicó en Supabase y queda en imagenes-y-auditoria-descuentos.sql.
 
-AdminReportes consulta cinco RPC en paralelo y filtra reportes por fecha; auditoría reciente tiene su propio alcance. CSV diario usa separador punto y coma, comillas, BOM, Blob y ObjectURL. El PDF de reportes usa impresión del navegador/CSS. Ticket usa jsPDF y qrcode; son mecanismos distintos. Los gráficos de reportes son CSS.
+AdminReportes calcula las fechas del período elegido (Hoy, 7 o 30 días; inicialmente 30) y delega en ReportesService, que consulta cuatro RPC en paralelo; auditoría reciente tiene su propio alcance. ReportesService genera el CSV diario con separador punto y coma, comillas, BOM, Blob y ObjectURL. El PDF de reportes usa impresión del navegador/CSS desde el componente. Ticket usa jsPDF y qrcode; son mecanismos distintos. Los gráficos de reportes son CSS.
+
+El 7 de octubre se separó el componente comprimido en admin-reportes.component.ts (estado y acciones), admin-reportes.component.html (vista), admin-reportes.component.css (estilos), reportes.service.ts (consultas/exportación) y reportes.model.ts (interfaces). Se agregaron comentarios básicos y se conservan las RPC, filtros, contenido y formato de descarga existentes. Esta modificación no agregó pruebas nuevas ni volvió a ejecutar la batería de autenticación.
+
+Después el usuario pidió retirar pagos pendientes. Se quitaron la tabla, la consulta obtener_ordenes_pendientes_admin, confirmar/confirmarPago, las señales de pendientes/procesando/mensaje y la interface OrdenPendiente. Las compras actuales ya quedan pagadas automáticamente. Las RPC históricas del servidor se conservaron: la limpieza solicitada se realizó en Reportes y no modificó las funciones de compra ni los datos existentes.
 
 El QR es un código del servidor. validar_qr_orden exige personal autorizado, orden pagada y control de uso único por tipo; registra la validación. Los comprobantes de Ticket dependen de datos de navegación/sessionStorage, no de una recuperación completa desde cualquier navegador.
 
