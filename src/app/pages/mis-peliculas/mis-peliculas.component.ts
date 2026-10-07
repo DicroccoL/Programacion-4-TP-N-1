@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { ExperienciaClienteService, MiAlertaEstreno, MiPelicula } from '../../core/services/experiencia-cliente.service';
@@ -39,6 +40,7 @@ import { FechaArgentinaPipe } from '../../shared/pipes/fecha-argentina.pipe';
  * crédito y cancelaciones. Las reglas definitivas se controlan en Supabase.
  */
 export class MisPeliculasComponent implements OnInit {
+  private readonly formatoMoneda = new CurrencyPipe('es-AR');
   private readonly auth = inject(AuthService);
   private readonly experiencia = inject(ExperienciaClienteService);
   private readonly formatoFecha = new FechaArgentinaPipe();
@@ -61,7 +63,7 @@ export class MisPeliculasComponent implements OnInit {
     finally { this.cargando.set(false); }
   }
   fecha(value: string): string { return this.formatoFecha.transform(value,true); }
-  moneda(value:number):string{return new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0}).format(value);}
+  moneda(value: number): string { return this.formatoMoneda.transform(value, 'ARS', 'symbol', '1.0-0') ?? '$ 0'; }
   idioma(value:string):string{return value==='SUBTITULADA'?'Subtitulada':'Castellano';}
 
   /** Control visual: sólo muestra cancelar si faltan más de dos horas. */
@@ -72,7 +74,7 @@ export class MisPeliculasComponent implements OnInit {
   async cancelar(ordenId:string):Promise<void>{
     if(!confirm('La orden se cancelará y el total se acreditará como crédito en tu cuenta. ¿Continuar?'))return;
     this.cancelando.set(ordenId);this.error.set('');this.mensaje.set('');
-    try{const credito=await this.experiencia.cancelarMiOrden(ordenId);this.mensaje.set(`Orden cancelada. Se acreditaron ${credito.toLocaleString('es-AR',{style:'currency',currency:'ARS'})} en tu saldo.`);
+    try{const credito=await this.experiencia.cancelarMiOrden(ordenId);this.mensaje.set(`Orden cancelada. Se acreditaron ${this.moneda(credito)} en tu saldo.`);
       try { await Promise.all([this.auth.refreshCurrentProfile(),this.recargarHistorial()]); }
       catch { this.error.set('La orden se canceló, pero no se pudo actualizar la pantalla. Volvé a cargarla para ver el saldo y el historial actualizados.'); }}
     catch(e){this.error.set(e instanceof Error?e.message:'No se pudo cancelar la orden.');}

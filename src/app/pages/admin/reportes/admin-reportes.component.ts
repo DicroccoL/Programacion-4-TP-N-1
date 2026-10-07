@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
 import { ReportesService } from '../../../core/services/reportes.service';
 import {
   Actividad,
@@ -17,6 +18,7 @@ import { FechaArgentinaPipe } from '../../../shared/pipes/fecha-argentina.pipe';
   styleUrl: './admin-reportes.component.css',
 })
 export class AdminReportesComponent implements OnInit {
+  private readonly formatoMoneda = new CurrencyPipe('es-AR');
   private readonly reportes = inject(ReportesService);
   private readonly formatoFecha = new FechaArgentinaPipe();
   private readonly hoy = new Date();
@@ -91,11 +93,7 @@ export class AdminReportesComponent implements OnInit {
 
   /** Presenta importes en pesos argentinos, sin decimales. */
   moneda(valor: number): string {
-    return new Intl.NumberFormat('es-AR', {
-      style: 'currency',
-      currency: 'ARS',
-      maximumFractionDigits: 0,
-    }).format(valor);
+    return this.formatoMoneda.transform(valor, 'ARS', 'symbol', '1.0-0') ?? '$ 0';
   }
 
   /** Reutiliza el pipe para mostrar fecha y hora de la actividad. */

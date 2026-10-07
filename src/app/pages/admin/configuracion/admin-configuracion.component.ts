@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminCuponesComponent } from './admin-cupones.component';
 import { SalasFuncionesService } from '../../../core/services/salas-funciones.service';
@@ -31,6 +32,7 @@ import { SalasFuncionesService } from '../../../core/services/salas-funciones.se
 /** Administra la configuración global, principalmente el precio base. */
 export class AdminConfiguracionComponent implements OnInit {
   private readonly programacion = inject(SalasFuncionesService);
+  private readonly formatoMoneda = new CurrencyPipe('es-AR');
   readonly guardando = signal(false); readonly cargando = signal(true);
   readonly configuracionCargada = signal(false); readonly error = signal(''); readonly mensaje = signal('');
   precio = 0;
@@ -54,7 +56,8 @@ export class AdminConfiguracionComponent implements OnInit {
     try {
       await this.programacion.actualizarPrecioEntradaBase(Number(this.precio));
       this.precio = await this.programacion.obtenerPrecioEntradaBase();
-      this.mensaje.set(`Precio guardado y verificado: ${this.precio.toLocaleString('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0})}. Se actualizó también en todas las funciones existentes.`);
+      const precioFormateado = this.formatoMoneda.transform(this.precio, 'ARS', 'symbol', '1.0-0');
+      this.mensaje.set(`Precio guardado y verificado: ${precioFormateado}. Se actualizó también en todas las funciones existentes.`);
     }
     catch (e) { this.error.set(`No se pudo guardar el precio: ${this.detalle(e)}`); }
     finally { this.guardando.set(false); }

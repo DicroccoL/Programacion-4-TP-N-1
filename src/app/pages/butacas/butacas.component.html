@@ -37,9 +37,9 @@
         <h2>Resumen</h2>
         @if (!seleccionadas().length) { <p class="resumen-vacio">Elegí hasta 8 butacas libres para continuar.</p> }
         @else {
-          <ul>@for (butaca of seleccionadas(); track butaca.id) {<li><span>{{ butaca.fila }}{{ butaca.numero }}<small>{{ butaca.tipo === 'VIP' ? ' · VIP' : butaca.tipo === 'ACCESIBLE' ? ' · Accesible' : '' }}</small></span><strong>{{ precio(butaca) | monedaArgentina }}</strong><button type="button" aria-label="Quitar butaca" (click)="alternar(butaca)">×</button></li>}</ul>
-          <div class="subtotal"><span>Subtotal</span><strong>{{ subtotal() | monedaArgentina }}</strong></div>
-          <div class="total"><span>Total antes de descuentos</span><strong>{{ subtotal() | monedaArgentina }}</strong></div>
+          <ul>@for (butaca of seleccionadas(); track butaca.id) {<li><span>{{ butaca.fila }}{{ butaca.numero }}<small>{{ butaca.tipo === 'VIP' ? ' · VIP' : butaca.tipo === 'ACCESIBLE' ? ' · Accesible' : '' }}</small></span><strong>{{ precio(butaca) | currency:'ARS':'symbol':'1.0-0' }}</strong><button type="button" aria-label="Quitar butaca" (click)="alternar(butaca)">×</button></li>}</ul>
+          <div class="subtotal"><span>Subtotal</span><strong>{{ subtotal() | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
+          <div class="total"><span>Total antes de descuentos</span><strong>{{ subtotal() | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
           @if (edadMinima()) {
             <div class="control-edad"><strong>Clasificación {{ f.pelicula?.clasificacion }}</strong>
               @if (!usuarioAutenticado()) {

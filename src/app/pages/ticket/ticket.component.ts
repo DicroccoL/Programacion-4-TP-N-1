@@ -1,15 +1,15 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
 import { ComprobanteCompra } from '../../core/services/compras.service';
-import { MonedaArgentinaPipe } from '../../shared/pipes/moneda-argentina.pipe';
 import { FechaArgentinaPipe } from '../../shared/pipes/fecha-argentina.pipe';
 
 @Component({
   selector: 'app-ticket',
   standalone: true,
-  imports: [RouterLink, MonedaArgentinaPipe],
+  imports: [RouterLink, CurrencyPipe],
   template: `
     <main class="ticket-page">
       <a routerLink="/" class="volver">← Volver a cartelera</a>
@@ -28,11 +28,11 @@ import { FechaArgentinaPipe } from '../../shared/pipes/fecha-argentina.pipe';
             <div><span>Sala</span><strong>{{ t.sala }} · {{ t.formato }} · {{ t.idioma === 'CASTELLANO' ? 'Castellano' : 'Subtitulada' }}</strong></div>
             <div><span>Butacas</span><strong>{{ t.butacas.join(', ') }}</strong></div>
             <div><span>N.º de orden</span><strong>{{ t.ordenId }}</strong></div>
-            <div><span>Subtotal</span><strong>{{ (t.subtotal ?? t.total) | monedaArgentina }}</strong></div>
+            <div><span>Subtotal</span><strong>{{ (t.subtotal ?? t.total) | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
             @if ((t.descuento ?? 0) > 0 && t.codigoCupon) {
-              <div class="descuento"><span>Cupón {{ t.codigoCupon }} · {{ porcentaje(t) }}% OFF</span><strong>−{{ t.descuento | monedaArgentina }}</strong></div>
+              <div class="descuento"><span>Cupón {{ t.codigoCupon }} · {{ porcentaje(t) }}% OFF</span><strong>−{{ t.descuento | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
             }
-            <div class="total"><span>Total</span><strong>{{ t.total | monedaArgentina }}</strong></div>
+            <div class="total"><span>Total</span><strong>{{ t.total | currency:'ARS':'symbol':'1.0-0' }}</strong></div>
           </div>
           @if (qr()) { <img class="qr" [src]="qr()" alt="QR de identificación de la orden"> }
           <p class="nota">Tu orden quedó registrada y las butacas ya están ocupadas. El QR de este ticket está listo para validar en el cine. El sitio todavía no procesa pagos en línea.</p>
@@ -51,6 +51,7 @@ import { FechaArgentinaPipe } from '../../shared/pipes/fecha-argentina.pipe';
 export class TicketComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly formatoFecha = new FechaArgentinaPipe();
+  private readonly formatoMoneda = new CurrencyPipe('es-AR');
   readonly ticket = signal<ComprobanteCompra | null>(null);
   readonly qr = signal('');
   readonly cargando = signal(true);
@@ -119,6 +120,6 @@ export class TicketComponent implements OnInit {
   }
 
   private moneda(value: number): string {
-    return new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(value);
+    return this.formatoMoneda.transform(value, 'ARS', 'symbol', '1.0-0') ?? '$ 0';
   }
 }

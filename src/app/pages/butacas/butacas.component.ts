@@ -1,4 +1,5 @@
 import { Component, OnDestroy, OnInit, computed, inject, signal } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { RealtimeChannel } from '@supabase/supabase-js';
@@ -8,12 +9,11 @@ import { ButacasService } from '../../core/services/butacas.service';
 import { ComprasService } from '../../core/services/compras.service';
 import { Butaca, Funcion } from '../../models/cine.model';
 import { FechaArgentinaPipe } from '../../shared/pipes/fecha-argentina.pipe';
-import { MonedaArgentinaPipe } from '../../shared/pipes/moneda-argentina.pipe';
 import { SelectorFechaComponent } from '../../shared/components/selector-fecha/selector-fecha.component';
 
 @Component({
   selector: 'app-butacas', standalone: true,
-  imports: [MonedaArgentinaPipe, FechaArgentinaPipe, RouterLink, FormsModule, SelectorFechaComponent],
+  imports: [CurrencyPipe, FechaArgentinaPipe, RouterLink, FormsModule, SelectorFechaComponent],
   templateUrl: './butacas.component.html', styleUrl: './butacas.component.css',
 })
 export class ButacasComponent implements OnInit, OnDestroy {

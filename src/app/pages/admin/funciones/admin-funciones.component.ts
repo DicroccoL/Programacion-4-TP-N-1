@@ -1,15 +1,15 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PeliculasService } from '../../../core/services/peliculas.service';
 import { SalasFuncionesService } from '../../../core/services/salas-funciones.service';
 import { Pelicula } from '../../../models/pelicula.model';
 import { FormatoProyeccion, Funcion, IdiomaFuncion } from '../../../models/cine.model';
 import { FechaArgentinaPipe } from '../../../shared/pipes/fecha-argentina.pipe';
-import { MonedaArgentinaPipe } from '../../../shared/pipes/moneda-argentina.pipe';
 import { SelectorFechaComponent } from '../../../shared/components/selector-fecha/selector-fecha.component';
 
 @Component({
-  selector: 'app-admin-funciones', standalone: true, imports: [FormsModule, FechaArgentinaPipe, MonedaArgentinaPipe, SelectorFechaComponent],
+  selector: 'app-admin-funciones', standalone: true, imports: [FormsModule, FechaArgentinaPipe, CurrencyPipe, SelectorFechaComponent],
   template: `
     <section class="programacion-admin">
       <div><h3>Programar función</h3><p>La sala compatible se asigna automáticamente según formato, idioma y disponibilidad.</p></div>
@@ -25,7 +25,7 @@ import { SelectorFechaComponent } from '../../../shared/components/selector-fech
       @if (error()) {<p class="aviso error" role="alert">{{ error() }}</p>}
       <div class="lista-funciones"><h4>Próximas funciones</h4>
         @if (!funciones().length) {<p class="vacio">Todavía no hay funciones programadas.</p>}
-        @for (f of funciones(); track f.id) {<article><strong>{{ titulo(f.peliculaId) }}</strong><span>{{ f.fechaHoraInicio | fechaArgentina: true }}</span><span>Sala {{ f.sala?.numero ?? '—' }}</span><span>{{ f.formato }} · {{ f.idioma === 'CASTELLANO' ? 'Castellano' : 'Subtitulada' }}</span><span>{{ f.precioBase | monedaArgentina }}</span><button class="btn-eliminar" type="button" [disabled]="eliminando() === f.id" (click)="eliminar(f)">{{ eliminando() === f.id ? 'Eliminando…' : 'Eliminar' }}</button></article>}
+        @for (f of funciones(); track f.id) {<article><strong>{{ titulo(f.peliculaId) }}</strong><span>{{ f.fechaHoraInicio | fechaArgentina: true }}</span><span>Sala {{ f.sala?.numero ?? '—' }}</span><span>{{ f.formato }} · {{ f.idioma === 'CASTELLANO' ? 'Castellano' : 'Subtitulada' }}</span><span>{{ f.precioBase | currency:'ARS':'symbol':'1.0-0' }}</span><button class="btn-eliminar" type="button" [disabled]="eliminando() === f.id" (click)="eliminar(f)">{{ eliminando() === f.id ? 'Eliminando…' : 'Eliminar' }}</button></article>}
       </div>
     </section>
   `,
@@ -36,6 +36,7 @@ import { SelectorFechaComponent } from '../../../shared/components/selector-fech
 /** Crea, lista y elimina funciones futuras; la sala compatible la asigna Supabase. */
 export class AdminFuncionesComponent implements OnInit {
   private readonly peliculasService = inject(PeliculasService); private readonly programacion = inject(SalasFuncionesService);
+  private readonly formatoMoneda = new CurrencyPipe('es-AR');
   readonly peliculas = signal<Pelicula[]>([]); readonly funciones = signal<Funcion[]>([]);
   readonly formatos: FormatoProyeccion[] = ['2D','3D'];
   readonly guardando = signal(false); readonly error = signal(''); readonly mensaje = signal('');
@@ -59,7 +60,8 @@ export class AdminFuncionesComponent implements OnInit {
       }
       const precioBase = await this.programacion.obtenerPrecioEntradaBase();
       await this.programacion.crearFuncion({ peliculaId: this.peliculaId, fechaHoraInicio: this.inicio, formato: this.formato, idioma: this.idioma, precioBase });
-      this.mensaje.set(`Función creada con sala compatible y precio base ${precioBase.toLocaleString('es-AR',{style:'currency',currency:'ARS',maximumFractionDigits:0})}.`); await this.cargarFunciones();
+      const precioFormateado = this.formatoMoneda.transform(precioBase, 'ARS', 'symbol', '1.0-0');
+      this.mensaje.set(`Función creada con sala compatible y precio base ${precioFormateado}.`); await this.cargarFunciones();
     } catch (e) { this.error.set(`No se pudo crear la función: ${this.detalleError(e)}`); }
     finally { this.guardando.set(false); }
   }
